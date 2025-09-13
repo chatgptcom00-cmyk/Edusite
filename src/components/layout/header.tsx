@@ -2,7 +2,16 @@
 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Menu, User, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
@@ -19,6 +28,11 @@ const navLinks = [
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+
+  // In a real app, you'd get this from your auth state
+  const [isLoggedIn, setIsLoggedIn] = useState(true); 
+  const user = { name: 'Current User', email: 'user@example.com', image: '', initials: 'CC' };
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -49,12 +63,51 @@ export default function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 md:flex">
-          <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/signup">Sign Up</Link>
-          </Button>
+           {isLoggedIn ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={user.image} alt={user.name} />
+                    <AvatarFallback>{user.initials}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/signup">Sign Up</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -76,13 +129,24 @@ export default function Header() {
                   {link.label}
                 </Link>
               ))}
-              <div className="mt-6 flex flex-col gap-2">
-                <Button variant="outline" asChild>
-                  <Link href="/login" onClick={() => setIsOpen(false)}>Login</Link>
-                </Button>
-                <Button asChild>
-                  <Link href="/signup" onClick={() => setIsOpen(false)}>Sign Up</Link>
-                </Button>
+               <div className="mt-6 flex flex-col gap-2">
+                {isLoggedIn ? (
+                  <>
+                    <Button variant="outline" asChild>
+                       <Link href="/profile" onClick={() => setIsOpen(false)}>Profile</Link>
+                    </Button>
+                    <Button onClick={() => { setIsLoggedIn(false); setIsOpen(false); }}>Logout</Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" asChild>
+                      <Link href="/login" onClick={() => setIsOpen(false)}>Login</Link>
+                    </Button>
+                    <Button asChild>
+                      <Link href="/signup" onClick={() => setIsOpen(false)}>Sign Up</Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </nav>
           </SheetContent>
