@@ -1,3 +1,6 @@
+
+'use client';
+
 import RecommendedCourses from '@/components/recommended-courses';
 import {
   Accordion,
@@ -6,17 +9,27 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
-import { courses, getCourseById } from '@/lib/courses';
-import { Clock, PlayCircle, Star, UserCircle, FileText, Briefcase, Puzzle } from 'lucide-react';
+import { Course, courses, getCourseById } from '@/lib/courses';
+import { Clock, PlayCircle, Star, UserCircle, FileText, Briefcase, Puzzle, CheckCircle2 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useEffect, useState } from 'react';
 
-export default async function CoursePage({ params }: { params: { id: string } }) {
-  const course = getCourseById(params.id);
+// This is a client component to handle state for course completion
+function CourseContent({ course, allCourses }: { course: Course; allCourses: Course[] }) {
+  const [completedModules, setCompletedModules] = useState<Set<string>>(new Set());
 
-  if (!course) {
-    notFound();
-  }
+  const toggleModuleCompletion = (moduleId: string) => {
+    setCompletedModules(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(moduleId)) {
+        newSet.delete(moduleId);
+      } else {
+        newSet.add(moduleId);
+      }
+      return newSet;
+    });
+  };
 
   const tabbedContent = [
     {
@@ -26,25 +39,37 @@ export default async function CoursePage({ params }: { params: { id: string } })
       enabled: course.features.videos,
       content: (
         <Accordion type="single" collapsible className="w-full mt-4">
-          {course.modules.map((module, index) => (
-            <AccordionItem key={index} value={`item-${index}`}>
-              <AccordionTrigger className="font-medium hover:no-underline">
-                <div className="flex items-center gap-3">
-                  <PlayCircle className="h-5 w-5 text-primary" />
-                  <span>{module.title}</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="flex items-center justify-between pl-10">
-                <p className="text-sm text-muted-foreground">
-                  {module.type === 'video' ? 'Video' : 'Article'}
-                </p>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>{module.duration}</span>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
+          {course.modules.map((module, index) => {
+            const moduleId = `${course.id}-${index}`;
+            const isCompleted = completedModules.has(moduleId);
+            return (
+              <AccordionItem key={index} value={`item-${index}`}>
+                <AccordionTrigger className="font-medium hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <button onClick={(e) => {
+                        e.stopPropagation(); // Prevent accordion from opening/closing
+                        toggleModuleCompletion(moduleId);
+                      }}
+                      className="focus:outline-none"
+                      aria-label={isCompleted ? "Mark as incomplete" : "Mark as complete"}
+                    >
+                      <CheckCircle2 className={`h-6 w-6 transition-colors ${isCompleted ? 'text-blue-500 fill-current' : 'text-muted-foreground'}`} />
+                    </button>
+                    <span>{module.title}</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="flex items-center justify-between pl-14">
+                  <p className="text-sm text-muted-foreground">
+                    {module.type === 'video' ? 'Video' : 'Article'}
+                  </p>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span>{module.duration}</span>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )
+          })}
         </Accordion>
       )
     },
@@ -72,7 +97,7 @@ export default async function CoursePage({ params }: { params: { id: string } })
   ].filter(tab => tab.enabled);
 
   return (
-    <div className="bg-card/50">
+     <div className="bg-card/50">
       <div className="container mx-auto px-4 py-12 md:py-24">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
           <div className="lg:col-span-2">
@@ -127,8 +152,34 @@ export default async function CoursePage({ params }: { params: { id: string } })
         </div>
       </div>
       <div className="bg-background py-12 md:py-24">
-        <RecommendedCourses courseId={course.id} allCourses={courses} />
+        <RecommendedCourses courseId={course.id} allCourses={allCourses} />
       </div>
     </div>
   );
+}
+
+
+export default function CoursePageWrapper({ params }: { params: { id: string } }) {
+  const [course, setCourse] = useState<Course | undefined>(undefined);
+
+  useEffect(() => {
+    const foundCourse = getCourseById(params.id);
+    setCourse(foundCourse);
+  }, [params.id]);
+
+  if (course === undefined) {
+    // Still loading or course not found.
+    // notFound() can't be used in client component directly in this way,
+    // so we can show a loading state or handle not found case.
+    // For now, returning null or a loading indicator.
+    return null; 
+  }
+
+  // Handle case where course is null (not found after check)
+  if (course === null) {
+    notFound();
+    return null;
+  }
+
+  return <CourseContent course={course} allCourses={courses} />;
 }
