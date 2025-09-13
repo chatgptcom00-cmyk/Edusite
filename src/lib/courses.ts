@@ -1,4 +1,4 @@
-import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat } from "lucide-react";
+import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat, FileText, Briefcase, Puzzle } from "lucide-react";
 import { FC } from "react";
 
 export type CourseModule = {
@@ -20,6 +20,12 @@ export type Course = {
   modules: CourseModule[];
   icon: FC<{ className?: string }>;
   iconColor: string;
+  features: {
+    videos: boolean;
+    documents: boolean;
+    practical: boolean;
+    quiz: boolean;
+  }
 };
 
 export const courses: Course[] = [
@@ -41,6 +47,12 @@ export const courses: Course[] = [
     ],
     icon: Code,
     iconColor: 'hsl(var(--chart-1))',
+    features: {
+        videos: true,
+        documents: true,
+        practical: true,
+        quiz: false,
+    }
   },
   {
     id: '2',
@@ -60,6 +72,12 @@ export const courses: Course[] = [
     ],
     icon: Palette,
     iconColor: 'hsl(var(--chart-2))',
+    features: {
+        videos: true,
+        documents: true,
+        practical: false,
+        quiz: true,
+    }
   },
   {
     id: '3',
@@ -79,6 +97,12 @@ export const courses: Course[] = [
     ],
     icon: BrainCircuit,
     iconColor: 'hsl(var(--chart-3))',
+    features: {
+        videos: true,
+        documents: true,
+        practical: true,
+        quiz: true,
+    }
   },
     {
     id: '4',
@@ -98,6 +122,12 @@ export const courses: Course[] = [
     ],
     icon: HeartHandshake,
     iconColor: 'hsl(var(--chart-4))',
+    features: {
+        videos: true,
+        documents: false,
+        practical: false,
+        quiz: true,
+    }
   },
   {
     id: '5',
@@ -117,6 +147,12 @@ export const courses: Course[] = [
     ],
     icon: Camera,
     iconColor: 'hsl(var(--chart-5))',
+    features: {
+        videos: true,
+        documents: true,
+        practical: true,
+        quiz: false,
+    }
   },
   {
     id: '6',
@@ -136,6 +172,12 @@ export const courses: Course[] = [
     ],
     icon: ChefHat,
     iconColor: 'hsl(var(--primary))',
+    features: {
+        videos: true,
+        documents: true,
+        practical: true,
+        quiz: true,
+    }
   }
 ];
 

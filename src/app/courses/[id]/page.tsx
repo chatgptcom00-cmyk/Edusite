@@ -7,9 +7,9 @@ import {
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
 import { courses, getCourseById } from '@/lib/courses';
-import { Clock, PlayCircle, Star, UserCircle } from 'lucide-react';
-import Image from 'next/image';
+import { Clock, PlayCircle, Star, UserCircle, FileText, Briefcase, Puzzle } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export default async function CoursePage({ params }: { params: { id: string } }) {
   const course = getCourseById(params.id);
@@ -17,6 +17,59 @@ export default async function CoursePage({ params }: { params: { id: string } })
   if (!course) {
     notFound();
   }
+
+  const tabbedContent = [
+    {
+      value: 'videos',
+      label: 'Videos',
+      icon: PlayCircle,
+      enabled: course.features.videos,
+      content: (
+        <Accordion type="single" collapsible className="w-full mt-4">
+          {course.modules.map((module, index) => (
+            <AccordionItem key={index} value={`item-${index}`}>
+              <AccordionTrigger className="font-medium hover:no-underline">
+                <div className="flex items-center gap-3">
+                  <PlayCircle className="h-5 w-5 text-primary" />
+                  <span>{module.title}</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="flex items-center justify-between pl-10">
+                <p className="text-sm text-muted-foreground">
+                  {module.type === 'video' ? 'Video' : 'Article'}
+                </p>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4" />
+                  <span>{module.duration}</span>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      )
+    },
+    {
+      value: 'documents',
+      label: 'Documents',
+      icon: FileText,
+      enabled: course.features.documents,
+      content: <div className="p-6 text-center text-muted-foreground">No documents available for this course yet.</div>
+    },
+    {
+      value: 'practical',
+      label: 'Practical',
+      icon: Briefcase,
+      enabled: course.features.practical,
+      content: <div className="p-6 text-center text-muted-foreground">No practical exercises available for this course yet.</div>
+    },
+    {
+      value: 'quiz',
+      label: 'Quiz',
+      icon: Puzzle,
+      enabled: course.features.quiz,
+      content: <div className="p-6 text-center text-muted-foreground">No quiz available for this course yet.</div>
+    }
+  ].filter(tab => tab.enabled);
 
   return (
     <div className="bg-card/50">
@@ -32,59 +85,43 @@ export default async function CoursePage({ params }: { params: { id: string } })
                 {course.description}
               </p>
             </div>
-            <div className="aspect-video w-full overflow-hidden rounded-lg border bg-muted shadow-lg">
-              <Image
-                src={course.imageUrl}
-                alt={course.title}
-                width={1280}
-                height={720}
-                className="h-full w-full object-cover"
-                data-ai-hint={course.imageHint}
-              />
+            
+            <div className="mt-8 rounded-lg border bg-card shadow-sm">
+                <Tabs defaultValue={tabbedContent[0]?.value} className="w-full">
+                  <TabsList className="grid w-full grid-cols-4 m-2">
+                    {tabbedContent.map(tab => (
+                       <TabsTrigger key={tab.value} value={tab.value}>
+                        <tab.icon className="mr-2 h-5 w-5" />
+                        {tab.label}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                  {tabbedContent.map(tab => (
+                    <TabsContent key={tab.value} value={tab.value}>
+                      {tab.content}
+                    </TabsContent>
+                  ))}
+                </Tabs>
             </div>
-            <div className="mt-8">
-              <h2 className="font-headline text-2xl font-semibold">
-                About this course
-              </h2>
-              <p className="mt-4 text-foreground/70">{course.longDescription}</p>
-            </div>
+
           </div>
           <div className="lg:col-span-1">
             <div className="sticky top-24 rounded-lg border bg-card p-6 shadow-sm">
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <UserCircle className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium">{course.author}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Star className="h-5 w-5 text-yellow-400" fill="currentColor" />
-                  <span className="font-bold">{course.rating.toFixed(1)}</span>
-                </div>
+                 <h2 className="font-headline text-2xl font-semibold mb-4">
+                  About this course
+                </h2>
+                <p className="text-foreground/70">{course.longDescription}</p>
+
+                <div className="mt-6 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <UserCircle className="h-5 w-5 text-muted-foreground" />
+                    <span className="font-medium">{course.author}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Star className="h-5 w-5 text-yellow-400" fill="currentColor" />
+                    <span className="font-bold">{course.rating.toFixed(1)}</span>
+                  </div>
               </div>
-              <h3 className="font-headline text-xl font-semibold">
-                Course Content
-              </h3>
-              <Accordion type="single" collapsible className="w-full mt-4">
-                {course.modules.map((module, index) => (
-                  <AccordionItem key={index} value={`item-${index}`}>
-                    <AccordionTrigger className="font-medium hover:no-underline">
-                      <div className='flex items-center gap-3'>
-                        <PlayCircle className="h-5 w-5 text-primary" />
-                        <span>{module.title}</span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="flex items-center justify-between pl-10">
-                      <p className="text-sm text-muted-foreground">
-                        {module.type === 'video' ? 'Video' : 'Article'}
-                      </p>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        <Clock className="h-4 w-4" />
-                        <span>{module.duration}</span>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
             </div>
           </div>
         </div>
