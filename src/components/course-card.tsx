@@ -1,8 +1,6 @@
 import { Course } from '@/lib/courses';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from './ui/badge';
 import { Star, UserCircle } from 'lucide-react';
 
 interface CourseCardProps {
@@ -10,18 +8,18 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
+  const Icon = course.icon;
   return (
     <Link href={`/courses/${course.id}`} className="group">
       <Card className="h-full overflow-hidden transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2">
         <CardHeader className="p-0">
-          <div className="aspect-video overflow-hidden">
-            <Image
-              src={course.imageUrl}
-              alt={course.title}
-              width={600}
-              height={400}
-              className="h-full w-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
-              data-ai-hint={course.imageHint}
+          <div
+            className="aspect-video flex items-center justify-center bg-muted transition-colors duration-300 ease-in-out group-hover:bg-secondary"
+            style={{ backgroundColor: `${course.iconColor}20` }}
+          >
+            <Icon
+              className="h-20 w-20 text-white transition-transform duration-300 ease-in-out group-hover:scale-110"
+              style={{ color: course.iconColor }}
             />
           </div>
         </CardHeader>

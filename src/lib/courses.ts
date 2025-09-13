@@ -1,3 +1,6 @@
+import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat } from "lucide-react";
+import { FC } from "react";
+
 export type CourseModule = {
   title: string;
   duration: string;
@@ -15,6 +18,8 @@ export type Course = {
   rating: number;
   videoUrl: string;
   modules: CourseModule[];
+  icon: FC<{ className?: string }>;
+  iconColor: string;
 };
 
 export const courses: Course[] = [
@@ -34,6 +39,8 @@ export const courses: Course[] = [
       { title: 'State Management with Context', duration: '30:00', type: 'article' },
       { title: 'Performance Optimization Techniques', duration: '55:20', type: 'video' },
     ],
+    icon: Code,
+    iconColor: 'hsl(var(--chart-1))',
   },
   {
     id: '2',
@@ -51,6 +58,8 @@ export const courses: Course[] = [
       { title: 'Wireframing and Prototyping', duration: '25:00', type: 'article' },
       { title: 'Visual Design Principles', duration: '48:50', type: 'video' },
     ],
+    icon: Palette,
+    iconColor: 'hsl(var(--chart-2))',
   },
   {
     id: '3',
@@ -68,6 +77,8 @@ export const courses: Course[] = [
       { title: 'Introduction to Machine Learning', duration: '40:00', type: 'article' },
       { title: 'Building a Predictive Model', duration: '90:15', type: 'video' },
     ],
+    icon: BrainCircuit,
+    iconColor: 'hsl(var(--chart-3))',
   },
     {
     id: '4',
@@ -85,6 +96,8 @@ export const courses: Course[] = [
       { title: 'Mindful Breathing', duration: '15:00', type: 'article' },
       { title: 'Integrating Mindfulness into Daily Life', duration: '30:00', type: 'video' },
     ],
+    icon: HeartHandshake,
+    iconColor: 'hsl(var(--chart-4))',
   },
   {
     id: '5',
@@ -102,6 +115,8 @@ export const courses: Course[] = [
       { title: 'Composition Rules', duration: '20:00', type: 'article' },
       { title: 'Editing in Lightroom', duration: '70:40', type: 'video' },
     ],
+    icon: Camera,
+    iconColor: 'hsl(var(--chart-5))',
   },
   {
     id: '6',
@@ -119,6 +134,8 @@ export const courses: Course[] = [
       { title: 'The Art of Plating', duration: '25:00', type: 'article' },
       { title: 'Perfect Pan-Seared Steak', duration: '45:00', type: 'video' },
     ],
+    icon: ChefHat,
+    iconColor: 'hsl(var(--primary))',
   }
 ];
 

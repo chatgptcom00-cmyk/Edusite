@@ -18,7 +18,7 @@ export default function Home() {
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Button asChild size="lg" className="font-bold">
-              <Link href="#courses">
+              <Link href="/courses">
                 Explore Courses <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -30,14 +30,14 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Our Courses
+              Featured Courses
             </h2>
             <p className="mt-2 text-lg leading-8 text-foreground/70">
               Hand-picked courses to elevate your career.
             </p>
           </div>
           <div className="mx-auto mt-16 grid max-w-2xl grid-cols-1 gap-x-8 gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-2 lg:gap-y-16 xl:grid-cols-3">
-            {courses.slice(0, 6).map(course => (
+            {courses.slice(0, 3).map(course => (
               <CourseCard key={course.id} course={course} />
             ))}
           </div>
