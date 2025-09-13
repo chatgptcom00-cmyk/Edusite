@@ -1,3 +1,8 @@
+
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { courses, iconMap } from '@/lib/courses';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,6 +27,26 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 
 export default function AdminPage() {
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const session = localStorage.getItem('admin-auth');
+    if (session !== 'true') {
+      router.push('/admin/login');
+    } else {
+      setIsAuthenticated(true);
+    }
+  }, [router]);
+
+  if (!isAuthenticated) {
+    return (
+        <div className="flex h-screen items-center justify-center">
+            <p>Loading...</p>
+        </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
