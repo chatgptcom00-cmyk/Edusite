@@ -33,7 +33,7 @@ export default function AdminPage() {
   useEffect(() => {
     const session = localStorage.getItem('admin-auth');
     if (session !== 'true') {
-      router.push('/admin/login');
+      router.push('/wp-admin');
     } else {
       setIsAuthenticated(true);
     }
