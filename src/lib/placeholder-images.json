@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "course-1",
+      "description": "A person coding on a laptop with abstract shapes in the background",
+      "imageUrl": "https://picsum.photos/seed/course1/600/400",
+      "imageHint": "coding development"
+    },
+    {
+      "id": "course-2",
+      "description": "A digital artist working on a tablet with colorful graphics",
+      "imageUrl": "https://picsum.photos/seed/course2/600/400",
+      "imageHint": "digital art"
+    },
+    {
+      "id": "course-3",
+      "description": "A group of professionals collaborating around a whiteboard with charts",
+      "imageUrl": "https://picsum.photos/seed/course3/600/400",
+      "imageHint": "business strategy"
+    },
+    {
+      "id": "course-4",
+      "description": "A person meditating in a calm, modern environment",
+      "imageUrl": "https://picsum.photos/seed/course4/600/400",
+      "imageHint": "mindfulness wellness"
+    },
+    {
+      "id": "course-5",
+      "description": "A close-up of a camera lens with bokeh lights in the background",
+      "imageUrl": "https://picsum.photos/seed/course5/600/400",
+      "imageHint": "photography videography"
+    },
+    {
+      "id": "course-6",
+      "description": "A chef plating a gourmet dish in a professional kitchen",
+      "imageUrl": "https://picsum.photos/seed/course6/600/400",
+      "imageHint": "culinary arts"
+    }
+  ]
 }
