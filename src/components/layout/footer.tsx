@@ -11,7 +11,7 @@ export default function Footer() {
               <Logo />
             </Link>
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} CourseForge, Inc.
+              &copy; {new Date().getFullYear()} EduSite, Inc.
             </p>
           </div>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">

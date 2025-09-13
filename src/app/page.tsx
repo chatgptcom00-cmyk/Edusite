@@ -14,7 +14,7 @@ export default function Home() {
             <span>All Courses are 100% Free!</span>
           </div>
           <h1 className="font-headline text-4xl font-bold tracking-tight text-primary sm:text-6xl lg:text-7xl">
-            Unlock Your Potential with CourseForge
+            Unlock Your Potential with EduSite
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-foreground/80">
             Explore cutting-edge courses in technology, design, and business.
