@@ -1,4 +1,4 @@
-import { Course } from '@/lib/courses';
+import { Course, iconMap } from '@/lib/courses';
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ interface CourseCardProps {
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
-  const Icon = course.icon;
+  const Icon = iconMap[course.icon];
   return (
     <Link href={`/courses/${course.id}`} className="group">
       <Card className="h-full overflow-hidden transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2 bg-white rounded-2xl shadow-lg">

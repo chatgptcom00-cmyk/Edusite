@@ -1,4 +1,4 @@
-import { courses } from '@/lib/courses';
+import { courses, iconMap } from '@/lib/courses';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -130,43 +130,46 @@ export default function AdminUploadPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {courses.map(course => (
-                    <TableRow key={course.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-4">
-                          <div className="relative h-16 w-16 flex-shrink-0">
-                            <div className="flex h-16 w-16 items-center justify-center rounded-lg" style={{ backgroundColor: course.iconColor }}>
-                              <course.icon className="h-8 w-8 text-white" />
+                  {courses.map(course => {
+                    const Icon = iconMap[course.icon];
+                    return (
+                      <TableRow key={course.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-4">
+                            <div className="relative h-16 w-16 flex-shrink-0">
+                              <div className="flex h-16 w-16 items-center justify-center rounded-lg" style={{ backgroundColor: course.iconColor }}>
+                                <Icon className="h-8 w-8 text-white" />
+                              </div>
+                            </div>
+                            <div>
+                              <p className="font-semibold">{course.title}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {course.id}
+                              </p>
                             </div>
                           </div>
-                          <div>
-                            <p className="font-semibold">{course.title}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {course.id}
-                            </p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Checkbox defaultChecked={course.features.videos} />
-                      </TableCell>
-                       <TableCell className="text-center">
-                        <Checkbox defaultChecked={course.features.documents} />
-                      </TableCell>
-                       <TableCell className="text-center">
-                        <Checkbox defaultChecked={course.features.practical} />
-                      </TableCell>
-                       <TableCell className="text-center">
-                        <Checkbox defaultChecked={course.features.quiz} />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon">
-                          <Trash2 className="h-5 w-5 text-destructive" />
-                          <span className="sr-only">Delete course</span>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Checkbox defaultChecked={course.features.videos} />
+                        </TableCell>
+                         <TableCell className="text-center">
+                          <Checkbox defaultChecked={course.features.documents} />
+                        </TableCell>
+                         <TableCell className="text-center">
+                          <Checkbox defaultChecked={course.features.practical} />
+                        </TableCell>
+                         <TableCell className="text-center">
+                          <Checkbox defaultChecked={course.features.quiz} />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon">
+                            <Trash2 className="h-5 w-5 text-destructive" />
+                            <span className="sr-only">Delete course</span>
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </CardContent>

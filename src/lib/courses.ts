@@ -1,10 +1,24 @@
-import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat, FileText, Briefcase, Puzzle } from "lucide-react";
-import { FC } from "react";
+import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat, FileText, Briefcase, Puzzle, LucideProps } from "lucide-react";
+import { FC, ForwardRefExoticComponent, RefAttributes } from "react";
 
 export type CourseModule = {
   title: string;
   duration: string;
   type: 'video' | 'article';
+};
+
+export type IconComponent = ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
+
+export const iconMap: { [key: string]: IconComponent } = {
+  Code,
+  Palette,
+  BrainCircuit,
+  HeartHandshake,
+  Camera,
+  ChefHat,
+  FileText,
+  Briefcase,
+  Puzzle,
 };
 
 export type Course = {
@@ -18,7 +32,7 @@ export type Course = {
   rating: number;
   videoUrl: string;
   modules: CourseModule[];
-  icon: FC<{ className?: string }>;
+  icon: keyof typeof iconMap;
   iconColor: string;
   features: {
     videos: boolean;
@@ -45,7 +59,7 @@ export const courses: Course[] = [
       { title: 'State Management with Context', duration: '30:00', type: 'article' },
       { title: 'Performance Optimization Techniques', duration: '55:20', type: 'video' },
     ],
-    icon: Code,
+    icon: 'Code',
     iconColor: 'hsl(var(--chart-1))',
     features: {
         videos: true,
@@ -70,7 +84,7 @@ export const courses: Course[] = [
       { title: 'Wireframing and Prototyping', duration: '25:00', type: 'article' },
       { title: 'Visual Design Principles', duration: '48:50', type: 'video' },
     ],
-    icon: Palette,
+    icon: 'Palette',
     iconColor: 'hsl(var(--chart-2))',
     features: {
         videos: true,
@@ -95,7 +109,7 @@ export const courses: Course[] = [
       { title: 'Introduction to Machine Learning', duration: '40:00', type: 'article' },
       { title: 'Building a Predictive Model', duration: '90:15', type: 'video' },
     ],
-    icon: BrainCircuit,
+    icon: 'BrainCircuit',
     iconColor: 'hsl(var(--chart-3))',
     features: {
         videos: true,
@@ -120,7 +134,7 @@ export const courses: Course[] = [
       { title: 'Mindful Breathing', duration: '15:00', type: 'article' },
       { title: 'Integrating Mindfulness into Daily Life', duration: '30:00', type: 'video' },
     ],
-    icon: HeartHandshake,
+    icon: 'HeartHandshake',
     iconColor: 'hsl(var(--chart-4))',
     features: {
         videos: true,
@@ -145,7 +159,7 @@ export const courses: Course[] = [
       { title: 'Composition Rules', duration: '20:00', type: 'article' },
       { title: 'Editing in Lightroom', duration: '70:40', type: 'video' },
     ],
-    icon: Camera,
+    icon: 'Camera',
     iconColor: 'hsl(var(--chart-5))',
     features: {
         videos: true,
@@ -170,7 +184,7 @@ export const courses: Course[] = [
       { title: 'The Art of Plating', duration: '25:00', type: 'article' },
       { title: 'Perfect Pan-Seared Steak', duration: '45:00', type: 'video' },
     ],
-    icon: ChefHat,
+    icon: 'ChefHat',
     iconColor: 'hsl(var(--primary))',
     features: {
         videos: true,
