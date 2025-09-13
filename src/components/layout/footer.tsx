@@ -7,7 +7,9 @@ export default function Footer() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
           <div className="flex items-center gap-2">
-            <Logo />
+            <Link href="/" className="flex items-center gap-2">
+              <Logo />
+            </Link>
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} CourseForge, Inc.
             </p>
