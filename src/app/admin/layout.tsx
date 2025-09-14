@@ -129,10 +129,12 @@ export default function AdminLayout({
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="flex h-14 items-center justify-between border-b bg-background px-4">
+        <div className="flex h-14 items-center border-b bg-background px-4">
           <SidebarTrigger />
-          <h1 className="text-xl font-semibold">Admin Dashboard</h1>
-        </header>
+          <div className="flex-1 text-center">
+            <h1 className="text-xl font-semibold">Admin Dashboard</h1>
+          </div>
+        </div>
         <main className="flex-1 overflow-auto p-4">{children}</main>
       </SidebarInset>
     </SidebarProvider>
