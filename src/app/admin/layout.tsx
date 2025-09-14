@@ -34,6 +34,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
+import '../globals.css';
 
 const menuItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
@@ -131,13 +132,7 @@ export default function AdminLayout({
             </SidebarFooter>
           </Sidebar>
           <SidebarInset>
-            <div className="flex h-14 items-center border-b bg-background px-4">
-              <SidebarTrigger />
-              <div className="flex-1 text-center">
-                <h1 className="text-xl font-semibold">Admin Dashboard</h1>
-              </div>
-            </div>
-            <main className="flex-1 overflow-auto p-4">{children}</main>
+            <main className="flex-1 overflow-auto p-6 pt-10">{children}</main>
           </SidebarInset>
         </SidebarProvider>
       </body>
