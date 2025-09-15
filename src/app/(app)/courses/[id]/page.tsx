@@ -9,8 +9,9 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Course, courses, getCourseById } from '@/lib/courses';
-import { Clock, PlayCircle, Star, UserCircle, FileText, Briefcase, Puzzle, CheckCircle2 } from 'lucide-react';
+import { Clock, PlayCircle, Star, UserCircle, FileText, Briefcase, Puzzle, CheckCircle2, Download } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState } from 'react';
@@ -146,7 +147,14 @@ function CourseContent({ course, allCourses }: { course: Course; allCourses: Cou
                     <Star className="h-5 w-5 text-yellow-400" fill="currentColor" />
                     <span className="font-bold">{course.rating.toFixed(1)}</span>
                   </div>
-              </div>
+                </div>
+
+                {course.isDownloadable && (
+                  <Button className="mt-6 w-full font-semibold" size="lg">
+                    <Download className="mr-2 h-5 w-5" />
+                    Download Course Materials
+                  </Button>
+                )}
             </div>
           </div>
         </div>

@@ -9,6 +9,7 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -21,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
@@ -33,6 +35,7 @@ export default function EditCoursePage() {
   const [course, setCourse] = useState<Course | null>(null);
   const [icon, setIcon] = useState('');
   const [iconColor, setIconColor] = useState('');
+  const [isDownloadable, setIsDownloadable] = useState(false);
 
   useEffect(() => {
     const courseId = params.id as string;
@@ -41,6 +44,7 @@ export default function EditCoursePage() {
       setCourse(foundCourse);
       setIcon(foundCourse.icon);
       setIconColor(foundCourse.iconColor);
+      setIsDownloadable(foundCourse.isDownloadable);
     } else {
       // Handle course not found, maybe redirect
     }
@@ -50,7 +54,12 @@ export default function EditCoursePage() {
     if (course) {
       // In a real app, you would save this to your database.
       // For now, we'll just show a toast.
-      console.log('Saving changes:', { ...course, icon, iconColor });
+      console.log('Saving changes:', {
+        ...course,
+        icon,
+        iconColor,
+        isDownloadable,
+      });
       toast({
         title: 'Course Saved!',
         description: `${course.title} has been updated.`,
@@ -84,10 +93,10 @@ export default function EditCoursePage() {
         <CardHeader>
           <CardTitle>{course.title}</CardTitle>
           <CardDescription>
-            Update the icon and branding for this course.
+            Update the icon, branding, and settings for this course.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-8">
           <div className="flex items-center gap-8">
             <div className="space-y-2">
               <Label>Icon Preview</Label>
@@ -128,10 +137,29 @@ export default function EditCoursePage() {
               </div>
             </div>
           </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Course Settings</h3>
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <div>
+                <Label htmlFor="downloadable">Downloadable Content</Label>
+                <p className="text-sm text-muted-foreground">
+                  Allow users to download course materials.
+                </p>
+              </div>
+              <Switch
+                id="downloadable"
+                checked={isDownloadable}
+                onCheckedChange={setIsDownloadable}
+              />
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter>
           <Button onClick={handleSave} className="font-semibold" size="lg">
             Save Changes
           </Button>
-        </CardContent>
+        </CardFooter>
       </Card>
     </div>
   );

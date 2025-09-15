@@ -1,4 +1,4 @@
-import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat, FileText, Briefcase, Puzzle, LucideProps } from "lucide-react";
+import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat, FileText, Briefcase, Puzzle, LucideProps, Download } from "lucide-react";
 import { FC, ForwardRefExoticComponent, RefAttributes } from "react";
 
 export type CourseModule = {
@@ -19,6 +19,7 @@ export const iconMap: { [key: string]: IconComponent } = {
   FileText,
   Briefcase,
   Puzzle,
+  Download,
 };
 
 export type Course = {
@@ -40,6 +41,7 @@ export type Course = {
     practical: boolean;
     quiz: boolean;
   }
+  isDownloadable: boolean;
 };
 
 export const courses: Course[] = [
@@ -66,7 +68,8 @@ export const courses: Course[] = [
         documents: true,
         practical: true,
         quiz: false,
-    }
+    },
+    isDownloadable: true,
   },
   {
     id: '2',
@@ -91,7 +94,8 @@ export const courses: Course[] = [
         documents: true,
         practical: false,
         quiz: true,
-    }
+    },
+    isDownloadable: false,
   },
   {
     id: '3',
@@ -116,7 +120,8 @@ export const courses: Course[] = [
         documents: true,
         practical: true,
         quiz: true,
-    }
+    },
+    isDownloadable: true,
   },
     {
     id: '4',
@@ -141,7 +146,8 @@ export const courses: Course[] = [
         documents: false,
         practical: false,
         quiz: true,
-    }
+    },
+    isDownloadable: false,
   },
   {
     id: '5',
@@ -166,7 +172,8 @@ export const courses: Course[] = [
         documents: true,
         practical: true,
         quiz: false,
-    }
+    },
+    isDownloadable: true,
   },
   {
     id: '6',
@@ -191,7 +198,8 @@ export const courses: Course[] = [
         documents: true,
         practical: true,
         quiz: true,
-    }
+    },
+    isDownloadable: false,
   }
 ];
 
