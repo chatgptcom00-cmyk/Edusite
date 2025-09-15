@@ -75,9 +75,9 @@ export default function AboutPage() {
             </div>
             <div className="relative h-96 w-full overflow-hidden rounded-2xl shadow-xl">
                  <Image
-                    src="https://picsum.photos/seed/collaboration/800/600"
-                    alt="Students collaborating"
-                    data-ai-hint="diverse students working"
+                    src="https://picsum.photos/seed/digitalworld/800/600"
+                    alt="Digital world of learning"
+                    data-ai-hint="digital world"
                     fill
                     className="object-cover"
                  />
