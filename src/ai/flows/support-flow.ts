@@ -12,7 +12,6 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { courses } from '@/lib/courses';
 import * as nodemailer from 'nodemailer';
-import { onFlow } from 'genkit/flow';
 
 const SupportChatInputSchema = z.object({
   message: z.string().describe('The user\'s message or question.'),
@@ -127,17 +126,3 @@ export async function supportChat(
 ): Promise<SupportChatOutput> {
   return supportChatFlow(input);
 }
-
-// Log flow events for debugging and monitoring
-onFlow('supportChatFlow', async ({
-  flow,
-  events
-}) => {
-  for (const event of events) {
-    if (event.type === 'run:start') {
-      console.log(`[${flow.name}]-START: ${JSON.stringify(flow.input)}`);
-    } else if (event.type === 'run:finish') {
-      console.log(`[${flow.name}]-FINISH: ${JSON.stringify(flow.output)}`);
-    }
-  }
-});
