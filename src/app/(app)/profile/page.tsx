@@ -43,7 +43,7 @@ export default function ProfilePage() {
     {
       label: 'Password Reset',
       icon: KeyRound,
-      href: '/profile/password-reset',
+      href: '/profile/forgot-password',
     },
     { label: 'Your Downloads', icon: Download, href: '/profile/downloads' },
     { label: 'Saved Courses', icon: Heart, href: '/profile/saved-courses' },
