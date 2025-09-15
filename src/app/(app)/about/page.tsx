@@ -1,6 +1,8 @@
 
+'use client';
+
 import { Button } from '@/components/ui/button';
-import { BadgeCheck, BookOpen, Download, Gift, Globe, Target } from 'lucide-react';
+import { BadgeCheck, BookOpen, Download, Gift, Globe, Target, Award, Users, TrendingUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -26,6 +28,13 @@ const features = [
     icon: Download,
   },
 ];
+
+const stats = [
+  { name: 'Free Courses', value: '1000+', icon: BookOpen },
+  { name: 'Medals Won', value: '270+', icon: Award },
+  { name: 'Daily Views', value: '21K+', icon: Users },
+  { name: 'Growing Daily', value: 'More Coming Soon', icon: TrendingUp },
+]
 
 export default function AboutPage() {
   return (
@@ -105,9 +114,26 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-      
-      {/* Founder Section */}
+
+      {/* Stats Section */}
       <section className="py-24 sm:py-32">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid grid-cols-1 gap-px bg-border/20 sm:grid-cols-2 lg:grid-cols-4 rounded-2xl overflow-hidden shadow-lg">
+              {stats.map((stat) => (
+                <div key={stat.name} className="bg-card/80 px-4 py-10 text-center backdrop-blur-sm">
+                  <stat.icon className="mx-auto h-12 w-12 text-primary" />
+                  <p className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">{stat.value}</p>
+                  <p className="mt-2 text-base leading-7 text-muted-foreground">{stat.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Founder Section */}
+      <section className="py-24 sm:py-32 bg-card/50">
         <div className="container mx-auto px-4">
             <div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-16 items-center">
                 <div className="relative h-96 w-full overflow-hidden rounded-2xl shadow-xl lg:order-last">
