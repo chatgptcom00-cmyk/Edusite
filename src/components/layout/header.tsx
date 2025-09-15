@@ -51,7 +51,10 @@ export default function Header() {
             const userData = localStorage.getItem('user');
             if (userData) {
                 const parsedUser = JSON.parse(userData);
-                const initials = parsedUser.name?.charAt(0).toUpperCase() || '';
+                const nameParts = (parsedUser.name || '').split(' ');
+                const initials = (
+                  (nameParts[0]?.[0] || '') + (nameParts.length > 1 ? nameParts[nameParts.length - 1]?.[0] : '')
+                ).toUpperCase();
                 setUser({ ...parsedUser, image: '', initials });
             }
         } else {
