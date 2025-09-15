@@ -12,7 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { courses } from '@/lib/courses';
 import * as nodemailer from 'nodemailer';
-import { onFlow } from 'genkit';
+import { onFlow } from 'genkit/flow';
 
 const SupportChatInputSchema = z.object({
   message: z.string().describe('The user\'s message or question.'),
