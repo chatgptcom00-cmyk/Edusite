@@ -28,11 +28,16 @@ const navLinks = [
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const isAdminPage = pathname.startsWith('/admin') || pathname.startsWith('/wp-admin');
 
   // In a real app, you'd get this from your auth state
   const [isLoggedIn, setIsLoggedIn] = useState(true); 
   const user = { name: 'Current User', email: 'user@example.com', image: '', initials: 'CC' };
 
+
+  if (isAdminPage) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
