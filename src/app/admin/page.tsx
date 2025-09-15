@@ -15,16 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { UploadCloud, Trash2, Video, FileText, Briefcase, Puzzle, TrendingUp } from 'lucide-react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Checkbox } from '@/components/ui/checkbox';
+import { UploadCloud, TrendingUp } from 'lucide-react';
 import {
   BookOpen,
 } from 'lucide-react';
@@ -80,8 +71,8 @@ export default function AdminPage() {
           </CardContent>
         </Card>
       </div>
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-1">
+      <div className="grid grid-cols-1 gap-8">
+        <div>
           <Card>
             <CardHeader>
               <CardTitle className="font-headline text-2xl">
@@ -140,94 +131,6 @@ export default function AdminPage() {
                   Upload Course
                 </Button>
               </form>
-            </CardContent>
-          </Card>
-        </div>
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="font-headline text-2xl">
-                Manage Courses
-              </CardTitle>
-              <CardDescription>
-                Review, edit, and delete existing courses.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Course</TableHead>
-                    <TableHead>
-                      <div className="flex items-center justify-center gap-2">
-                        <Video className="h-5 w-5" />
-                        <span className="sr-only">Videos</span>
-                      </div>
-                    </TableHead>
-                    <TableHead>
-                      <div className="flex items-center justify-center gap-2">
-                        <FileText className="h-5 w-5" />
-                        <span className="sr-only">Documents</span>
-                      </div>
-                    </TableHead>
-                    <TableHead>
-                      <div className="flex items-center justify-center gap-2">
-                        <Briefcase className="h-5 w-5" />
-                        <span className="sr-only">Practical</span>
-                      </div>
-                    </TableHead>
-                    <TableHead>
-                      <div className="flex items-center justify-center gap-2">
-                        <Puzzle className="h-5 w-5" />
-                        <span className="sr-only">Quiz</span>
-                      </div>
-                    </TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {courses.map(course => {
-                    const Icon = iconMap[course.icon];
-                    return (
-                      <TableRow key={course.id}>
-                        <TableCell className="font-medium">
-                          <div className="flex items-center gap-4">
-                            <div className="relative h-16 w-16 flex-shrink-0">
-                              <div className="flex h-16 w-16 items-center justify-center rounded-lg" style={{ backgroundColor: course.iconColor }}>
-                                <Icon className="h-8 w-8 text-white" />
-                              </div>
-                            </div>
-                            <div>
-                              <p className="font-semibold">{course.title}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {course.id}
-                              </p>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Checkbox defaultChecked={course.features.videos} />
-                        </TableCell>
-                         <TableCell className="text-center">
-                          <Checkbox defaultChecked={course.features.documents} />
-                        </TableCell>
-                         <TableCell className="text-center">
-                          <Checkbox defaultChecked={course.features.practical} />
-                        </TableCell>
-                         <TableCell className="text-center">
-                          <Checkbox defaultChecked={course.features.quiz} />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button variant="ghost" size="icon">
-                            <Trash2 className="h-5 w-5 text-destructive" />
-                            <span className="sr-only">Delete course</span>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
             </CardContent>
           </Card>
         </div>
