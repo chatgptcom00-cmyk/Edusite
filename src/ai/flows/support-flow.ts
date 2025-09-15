@@ -76,7 +76,7 @@ const allCourseInfo = courses.map(c => `- ${c.title}: ${c.description}`).join('\
 const supportChatPrompt = ai.definePrompt({
     name: 'supportChatPrompt',
     input: { schema: SupportChatInputSchema },
-    output: { format: 'json', schema: SupportChatOutputSchema },
+    output: { schema: SupportChatOutputSchema },
     tools: [emailForwardingTool],
     system: `You are a friendly and helpful customer support chatbot for an online learning platform called "Edusite".
 
@@ -109,7 +109,7 @@ const supportChatFlow = ai.defineFlow(
   },
   async (input) => {
     const llmResponse = await supportChatPrompt(input);
-    const output = llmResponse.output();
+    const output = llmResponse.output;
 
     if (!output) {
       throw new Error('Flow failed to produce output.');
