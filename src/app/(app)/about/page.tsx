@@ -66,9 +66,9 @@ export default function AboutPage() {
             </div>
             <div className="relative h-96 w-full overflow-hidden rounded-2xl shadow-xl">
                  <Image
-                    src="https://picsum.photos/seed/about1/800/600"
-                    alt="Students learning together"
-                    data-ai-hint="diverse students collaborating"
+                    src="https://picsum.photos/seed/collaboration/800/600"
+                    alt="Students collaborating"
+                    data-ai-hint="diverse students working"
                     fill
                     className="object-cover"
                  />
@@ -109,19 +109,34 @@ export default function AboutPage() {
       {/* Founder Section */}
       <section className="py-24 sm:py-32">
         <div className="container mx-auto px-4">
-            <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-16 items-center">
-                <div className="lg:col-span-2">
+            <div className="mx-auto grid max-w-7xl grid-cols-1 lg:grid-cols-2 gap-x-16 gap-y-16 items-center">
+                <div className="relative h-96 w-full overflow-hidden rounded-2xl shadow-xl lg:order-last">
+                     <Image
+                        src="https://picsum.photos/seed/modern-learning/800/600"
+                        alt="Modern learning environment"
+                        data-ai-hint="library technology"
+                        fill
+                        className="object-cover"
+                     />
+                </div>
+                <div>
                     <h2 className="font-headline text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                         Our Founding Vision
                     </h2>
                     <p className="mt-6 text-lg leading-8 text-muted-foreground">
                         Founded by <strong className="font-semibold text-primary">PixS Organisation</strong>, Edusite carries the vision of breaking barriers in education and empowering students with the right resources to achieve their goals—all in one place, all for free.
                     </p>
-                </div>
-                <div className="flex justify-center">
-                    <div className="rounded-full bg-primary/10 p-8">
-                      <div className="rounded-full bg-primary/20 p-8">
-                        <Target className="h-24 w-24 text-primary" />
+                    <div className="mt-8 flex items-center gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="rounded-full bg-primary/10 p-4">
+                          <div className="rounded-full bg-primary/20 p-4">
+                            <Target className="h-12 w-12 text-primary" />
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-semibold">Our Goal</h3>
+                        <p className="text-muted-foreground">To provide universally accessible education and empower learners worldwide.</p>
                       </div>
                     </div>
                 </div>
