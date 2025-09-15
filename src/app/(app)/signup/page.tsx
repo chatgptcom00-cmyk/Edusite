@@ -40,6 +40,7 @@ export default function SignupPage() {
 
     // Simulate successful signup and login
     localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('user', JSON.stringify({ name, email }));
     window.dispatchEvent(new Event('storage')); // Notify header to update
     toast({
       title: 'Account Created!',

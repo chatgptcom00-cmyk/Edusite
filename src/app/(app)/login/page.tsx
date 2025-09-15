@@ -38,7 +38,9 @@ export default function LoginPage() {
     console.log('Logging in with:', { email, password });
 
     // Simulate successful login
+    const userName = email.split('@')[0];
     localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('user', JSON.stringify({ name: userName, email }));
     window.dispatchEvent(new Event('storage')); // Notify header to update
     toast({
       title: 'Login Successful',

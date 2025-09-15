@@ -26,6 +26,13 @@ const navLinks = [
   { href: '/contact', label: 'Contact' },
 ];
 
+type User = {
+    name: string;
+    email: string;
+    image: string;
+    initials: string;
+}
+
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
@@ -33,31 +40,42 @@ export default function Header() {
 
   // In a real app, you'd get this from your auth state
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
-  const user = { name: 'Current User', email: 'user@example.com', image: '', initials: 'CC' };
+  const [user, setUser] = useState<User>({ name: '', email: '', image: '', initials: '' });
 
   useEffect(() => {
-    const authStatus = localStorage.getItem('isLoggedIn');
-    if (authStatus === 'true') {
-      setIsLoggedIn(true);
-    }
-    
-    const handleStorageChange = () => {
-       const authStatus = localStorage.getItem('isLoggedIn');
-       setIsLoggedIn(authStatus === 'true');
+    const updateUserState = () => {
+        const authStatus = localStorage.getItem('isLoggedIn');
+        setIsLoggedIn(authStatus === 'true');
+
+        if (authStatus === 'true') {
+            const userData = localStorage.getItem('user');
+            if (userData) {
+                const parsedUser = JSON.parse(userData);
+                const initials = parsedUser.name?.charAt(0).toUpperCase() || '';
+                setUser({ ...parsedUser, image: '', initials });
+            }
+        } else {
+            setUser({ name: '', email: '', image: '', initials: '' });
+        }
     };
     
-    window.addEventListener('storage', handleStorageChange);
+    updateUserState();
+    
+    window.addEventListener('storage', updateUserState);
     
     return () => {
-        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('storage', updateUserState);
     };
 
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('user');
     setIsLoggedIn(false);
+    setUser({ name: '', email: '', image: '', initials: '' });
     setIsOpen(false);
+    window.dispatchEvent(new Event('storage'));
   };
 
   if (isAdminPage) {
