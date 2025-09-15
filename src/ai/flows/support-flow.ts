@@ -111,7 +111,14 @@ const supportChatFlow = ai.defineFlow(
     const output = llmResponse.output;
 
     if (!output) {
-      throw new Error('Flow failed to produce output.');
+      // If the model doesn't return a structured output, create a generic reply.
+      const fallbackResponse = await ai.generate({
+        prompt: `You are a friendly support chatbot. The user said: "${input.message}". Provide a helpful, generic response, but mention that you couldn't fully process their request.`,
+      });
+      return {
+        reply: fallbackResponse.text ?? "I'm sorry, I'm having trouble understanding. Could you please rephrase?",
+        businessInquiryDetected: false,
+      };
     }
     
     // Default to false if not specified by the model
