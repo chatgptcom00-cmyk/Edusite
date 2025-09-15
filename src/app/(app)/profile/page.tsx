@@ -44,9 +44,20 @@ export default function ProfilePage() {
       label: 'Password Reset',
       icon: KeyRound,
       href: '/profile/forgot-password',
+      description: 'Manage your password'
     },
-    { label: 'Your Downloads', icon: Download, href: '/profile/downloads' },
-    { label: 'Saved Courses', icon: Heart, href: '/profile/saved-courses' },
+    { 
+      label: 'Your Downloads', 
+      icon: Download, 
+      href: '/profile/downloads',
+      description: 'Access downloadable content'
+    },
+    { 
+      label: 'Saved Courses', 
+      icon: Heart, 
+      href: '/profile/saved-courses',
+      description: 'View your saved courses'
+    },
   ];
   
   if (loading) {
@@ -118,7 +129,7 @@ export default function ProfilePage() {
                 <div>
                   <h3 className="font-semibold">{item.label}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Manage your {item.label.toLowerCase()}
+                    {item.description}
                   </p>
                 </div>
               </Link>

@@ -9,7 +9,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Course, courses, getCourseById } from '@/lib/courses';
-import { Clock, PlayCircle, Star, UserCircle, FileText, Briefcase, Puzzle, CheckCircle2, Download } from 'lucide-react';
+import { Clock, PlayCircle, Star, UserCircle, FileText, Briefcase, Puzzle, CheckCircle2, Download, Heart } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -124,18 +124,21 @@ async function CourseContent({ course, allCourses }: { course: Course; allCourse
                   </div>
                 </div>
 
-                {course.isDownloadable && (
-                  <Button className="mt-6 w-full font-semibold" size="lg">
-                    <Download className="mr-2 h-5 w-5" />
-                    Download Course Materials
-                  </Button>
-                )}
+                <div className="mt-6 flex flex-col gap-2">
+                   {course.isDownloadable && (
+                      <Button className="w-full font-semibold" size="lg">
+                        <Download className="mr-2 h-5 w-5" />
+                        Download Materials
+                      </Button>
+                    )}
+                    <Button variant="outline" className="w-full font-semibold" size="lg">
+                        <Heart className="mr-2 h-5 w-5" />
+                        Save for Later
+                    </Button>
+                </div>
             </div>
           </div>
         </div>
-      </div>
-      <div className="bg-background py-12 md:py-24">
-        <RecommendedCourses courseId={course.id} allCourses={allCourses} />
       </div>
     </div>
   );
