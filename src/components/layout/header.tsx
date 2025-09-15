@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -14,7 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Menu, User, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import Logo from './logo';
 
@@ -31,9 +32,33 @@ export default function Header() {
   const isAdminPage = pathname.startsWith('/admin') || pathname.startsWith('/wp-admin');
 
   // In a real app, you'd get this from your auth state
-  const [isLoggedIn, setIsLoggedIn] = useState(true); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
   const user = { name: 'Current User', email: 'user@example.com', image: '', initials: 'CC' };
 
+  useEffect(() => {
+    const authStatus = localStorage.getItem('isLoggedIn');
+    if (authStatus === 'true') {
+      setIsLoggedIn(true);
+    }
+    
+    const handleStorageChange = () => {
+       const authStatus = localStorage.getItem('isLoggedIn');
+       setIsLoggedIn(authStatus === 'true');
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+    };
+
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isLoggedIn');
+    setIsLoggedIn(false);
+    setIsOpen(false);
+  };
 
   if (isAdminPage) {
     return null;
@@ -99,7 +124,7 @@ export default function Header() {
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setIsLoggedIn(false)}>
+                <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Logout</span>
                 </DropdownMenuItem>
@@ -142,7 +167,7 @@ export default function Header() {
                     <Button variant="outline" asChild>
                        <Link href="/profile" onClick={() => setIsOpen(false)}>Profile</Link>
                     </Button>
-                    <Button onClick={() => { setIsLoggedIn(false); setIsOpen(false); }}>Logout</Button>
+                    <Button onClick={handleLogout}>Logout</Button>
                   </>
                 ) : (
                   <>
