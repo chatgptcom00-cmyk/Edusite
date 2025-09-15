@@ -24,6 +24,7 @@ type User = {
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -35,6 +36,7 @@ export default function ProfilePage() {
       ).toUpperCase();
       setUser({ ...parsedUser, image: '', initials });
     }
+    setLoading(false);
   }, []);
 
   const menuItems = [
@@ -47,12 +49,25 @@ export default function ProfilePage() {
     { label: 'Saved Courses', icon: Heart, href: '/profile/saved-courses' },
   ];
   
-  if (!user) {
+  if (loading) {
     return (
         <div className="container mx-auto flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-12">
             <p>Loading profile...</p>
         </div>
     );
+  }
+
+  if (!user) {
+    return (
+      <div className="container mx-auto flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-12">
+        <div className="text-center">
+            <p className="mb-4">You need to be logged in to view this page.</p>
+            <Button asChild>
+                <Link href="/login">Login</Link>
+            </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
