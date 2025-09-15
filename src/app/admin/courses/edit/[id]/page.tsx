@@ -15,17 +15,12 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, UploadCloud } from 'lucide-react';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export default function EditCoursePage() {
   const router = useRouter();
@@ -77,6 +72,7 @@ export default function EditCoursePage() {
   }
 
   const IconPreview = iconMap[icon as keyof typeof iconMap];
+  const iconNames = Object.keys(iconMap);
 
   return (
     <div className="space-y-6">
@@ -97,36 +93,21 @@ export default function EditCoursePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-8">
-          <div className="flex items-center gap-8">
-            <div className="space-y-2">
-              <Label>Icon Preview</Label>
-              <div
-                className="flex h-24 w-24 items-center justify-center rounded-lg"
-                style={{ backgroundColor: iconColor }}
-              >
-                {IconPreview && (
-                  <IconPreview className="h-12 w-12 text-white" />
-                )}
-              </div>
-            </div>
-            <div className="flex-1 space-y-6">
+          <div className="space-y-4">
+             <div className="flex items-start gap-8">
               <div className="space-y-2">
-                <Label htmlFor="icon">Icon</Label>
-                <Select value={icon} onValueChange={setIcon}>
-                  <SelectTrigger id="icon">
-                    <SelectValue placeholder="Select an icon" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.keys(iconMap).map(iconName => (
-                      <SelectItem key={iconName} value={iconName}>
-                        {iconName}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Icon Preview</Label>
+                <div
+                  className="flex h-24 w-24 items-center justify-center rounded-lg"
+                  style={{ backgroundColor: iconColor }}
+                >
+                  {IconPreview && (
+                    <IconPreview className="h-12 w-12 text-white" />
+                  )}
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="icon-color">Icon Color</Label>
+              <div className="flex-1 space-y-2">
+                 <Label htmlFor="icon-color">Icon Color</Label>
                 <Input
                   id="icon-color"
                   type="color"
@@ -135,6 +116,52 @@ export default function EditCoursePage() {
                   className="h-12"
                 />
               </div>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <Label>Choose an Icon</Label>
+            <ScrollArea className="w-full">
+              <div className="grid grid-cols-6 gap-4 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12">
+                {iconNames.map(iconName => {
+                  const IconComponent = iconMap[iconName];
+                  return (
+                    <button
+                      key={iconName}
+                      onClick={() => setIcon(iconName)}
+                      className={cn(
+                        "flex flex-col items-center justify-center gap-2 rounded-lg border p-4 transition-colors",
+                        icon === iconName ? "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2" : "hover:bg-accent hover:text-accent-foreground"
+                      )}
+                    >
+                      <IconComponent className="h-6 w-6" />
+                      <span className="text-xs truncate">{iconName}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+          
+           <div className="space-y-2">
+            <Label>Or Upload Custom Icon</Label>
+            <div className="flex w-full items-center justify-center">
+              <label
+                htmlFor="logo-upload"
+                className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted hover:bg-secondary"
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  <UploadCloud className="mb-2 h-6 w-6 text-muted-foreground" />
+                  <p className="mb-1 text-sm text-muted-foreground">
+                    <span className="font-semibold">Click to upload</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    SVG, PNG, or JPG
+                  </p>
+                </div>
+                <Input id="logo-upload" type="file" className="hidden" />
+              </label>
             </div>
           </div>
 

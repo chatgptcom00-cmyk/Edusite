@@ -1,4 +1,4 @@
-import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat, FileText, Briefcase, Puzzle, LucideProps, Download } from "lucide-react";
+import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat, FileText, Briefcase, Puzzle, LucideProps, Download, BookOpen, GraduationCap, Lightbulb, Target, Rocket, BarChart, Globe, Database, Film } from "lucide-react";
 import { FC, ForwardRefExoticComponent, RefAttributes } from "react";
 
 export type CourseModule = {
@@ -20,11 +20,20 @@ export const iconMap: { [key: string]: IconComponent } = {
   Briefcase,
   Puzzle,
   Download,
+  BookOpen,
+  GraduationCap,
+  Lightbulb,
+  Target,
+  Rocket,
+  BarChart,
+  Globe,
+  Database,
+  Film,
 };
 
 export type Course = {
   id: string;
-  title: string;
+  title:string;
   description: string;
   longDescription: string;
   imageUrl: string;
