@@ -1,3 +1,6 @@
+
+'use client';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,16 +11,28 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Download, Heart, KeyRound, UserCircle, Camera } from 'lucide-react';
+import { Download, Heart, KeyRound, Camera } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+type User = {
+  name: string;
+  email: string;
+  image: string;
+  initials: string;
+};
 
 export default function ProfilePage() {
-  const user = {
-    name: 'Current User',
-    email: 'user@example.com',
-    image: '',
-    initials: 'CC',
-  };
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      const initials = (parsedUser.name || '').charAt(0).toUpperCase();
+      setUser({ ...parsedUser, image: '', initials });
+    }
+  }, []);
 
   const menuItems = [
     {
@@ -28,6 +43,14 @@ export default function ProfilePage() {
     { label: 'Your Downloads', icon: Download, href: '/profile/downloads' },
     { label: 'Saved Courses', icon: Heart, href: '/profile/saved-courses' },
   ];
+  
+  if (!user) {
+    return (
+        <div className="container mx-auto flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-12">
+            <p>Loading profile...</p>
+        </div>
+    );
+  }
 
   return (
     <div className="container mx-auto min-h-[calc(100vh-10rem)] max-w-4xl px-4 py-12 md:py-16">

@@ -1,6 +1,4 @@
 
-'use client';
-
 import RecommendedCourses from '@/components/recommended-courses';
 import {
   Accordion,
@@ -14,24 +12,10 @@ import { Course, courses, getCourseById } from '@/lib/courses';
 import { Clock, PlayCircle, Star, UserCircle, FileText, Briefcase, Puzzle, CheckCircle2, Download } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useEffect, useState } from 'react';
 
-// This is a client component to handle state for course completion
-function CourseContent({ course, allCourses }: { course: Course; allCourses: Course[] }) {
-  const [completedModules, setCompletedModules] = useState<Set<string>>(new Set());
-
-  const toggleModuleCompletion = (moduleId: string) => {
-    setCompletedModules(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(moduleId)) {
-        newSet.delete(moduleId);
-      } else {
-        newSet.add(moduleId);
-      }
-      return newSet;
-    });
-  };
-
+// This is a server component now.
+async function CourseContent({ course, allCourses }: { course: Course; allCourses: Course[] }) {
+  
   const tabbedContent = [
     {
       value: 'videos',
@@ -42,20 +26,11 @@ function CourseContent({ course, allCourses }: { course: Course; allCourses: Cou
         <Accordion type="single" collapsible className="w-full mt-4">
           {course.modules.map((module, index) => {
             const moduleId = `${course.id}-${index}`;
-            const isCompleted = completedModules.has(moduleId);
             return (
               <AccordionItem key={index} value={`item-${index}`}>
                 <AccordionTrigger className="font-medium hover:no-underline">
                   <div className="flex items-center gap-3">
-                    <button onClick={(e) => {
-                        e.stopPropagation(); // Prevent accordion from opening/closing
-                        toggleModuleCompletion(moduleId);
-                      }}
-                      className="focus:outline-none"
-                      aria-label={isCompleted ? "Mark as incomplete" : "Mark as complete"}
-                    >
-                      <CheckCircle2 className={`h-6 w-6 transition-colors ${isCompleted ? 'text-blue-500 fill-current' : 'text-muted-foreground'}`} />
-                    </button>
+                     <CheckCircle2 className={`h-6 w-6 transition-colors text-muted-foreground`} />
                     <span>{module.title}</span>
                   </div>
                 </AccordionTrigger>
@@ -114,7 +89,7 @@ function CourseContent({ course, allCourses }: { course: Course; allCourses: Cou
             
             <div className="mt-8 rounded-lg border bg-card shadow-sm">
                 <Tabs defaultValue={tabbedContent[0]?.value} className="w-full">
-                  <TabsList className="grid w-full grid-cols-4 m-2">
+                  <TabsList className={`grid w-full grid-cols-${tabbedContent.length} m-2`}>
                     {tabbedContent.map(tab => (
                        <TabsTrigger key={tab.value} value={tab.value}>
                         <tab.icon className="mr-2 h-5 w-5" />
@@ -167,26 +142,11 @@ function CourseContent({ course, allCourses }: { course: Course; allCourses: Cou
 }
 
 
-export default function CoursePageWrapper({ params }: { params: { id: string } }) {
-  const [course, setCourse] = useState<Course | undefined>(undefined);
+export default async function CoursePageWrapper({ params }: { params: { id: string } }) {
+  const course = getCourseById(params.id);
 
-  useEffect(() => {
-    const foundCourse = getCourseById(params.id);
-    setCourse(foundCourse);
-  }, [params.id]);
-
-  if (course === undefined) {
-    // Still loading or course not found.
-    // notFound() can't be used in client component directly in this way,
-    // so we can show a loading state or handle not found case.
-    // For now, returning null or a loading indicator.
-    return null; 
-  }
-
-  // Handle case where course is null (not found after check)
-  if (course === null) {
+  if (!course) {
     notFound();
-    return null;
   }
 
   return <CourseContent course={course} allCourses={courses} />;
