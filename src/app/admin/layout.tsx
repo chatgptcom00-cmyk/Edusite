@@ -38,7 +38,6 @@ import '../globals.css';
 const menuItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/courses', label: 'Courses', icon: Book },
-  { href: '/admin/upload', label: 'Upload', icon: PlusCircle },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
