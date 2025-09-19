@@ -1,156 +1,138 @@
 
-import RecommendedCourses from '@/components/recommended-courses';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { doc, getDoc, collection, getDocs, orderBy, query } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Course, courses, getCourseById } from '@/lib/courses';
-import { Clock, PlayCircle, Star, UserCircle, FileText, Briefcase, Puzzle, CheckCircle2, Download, Heart } from 'lucide-react';
-import { notFound } from 'next/navigation';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Download, Heart, Star, UserCircle } from 'lucide-react';
+import SubcategoryClientPage from '@/components/subcategory-client-page';
 
-// This is a server component now.
-async function CourseContent({ course, allCourses }: { course: Course; allCourses: Course[] }) {
-  
-  const tabbedContent = [
-    {
-      value: 'videos',
-      label: 'Videos',
-      icon: PlayCircle,
-      enabled: course.features.videos,
-      content: (
-        <Accordion type="single" collapsible className="w-full mt-4">
-          {course.modules.map((module, index) => {
-            const moduleId = `${course.id}-${index}`;
-            return (
-              <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="font-medium hover:no-underline">
-                  <div className="flex items-center gap-3">
-                     <CheckCircle2 className={`h-6 w-6 transition-colors text-muted-foreground`} />
-                    <span>{module.title}</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="flex items-center justify-between pl-14">
-                  <p className="text-sm text-muted-foreground">
-                    {module.type === 'video' ? 'Video' : 'Article'}
-                  </p>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Clock className="h-4 w-4" />
-                    <span>{module.duration}</span>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-            )
-          })}
-        </Accordion>
-      )
-    },
-    {
-      value: 'documents',
-      label: 'Documents',
-      icon: FileText,
-      enabled: course.features.documents,
-      content: <div className="p-6 text-center text-muted-foreground">No documents available for this course yet.</div>
-    },
-    {
-      value: 'practical',
-      label: 'Practical',
-      icon: Briefcase,
-      enabled: course.features.practical,
-      content: <div className="p-6 text-center text-muted-foreground">No practical exercises available for this course yet.</div>
-    },
-    {
-      value: 'quiz',
-      label: 'Quiz',
-      icon: Puzzle,
-      enabled: course.features.quiz,
-      content: <div className="p-6 text-center text-muted-foreground">No quiz available for this course yet.</div>
+
+export type Subcategory = {
+    id: string;
+    name: string;
+    description: string;
+};
+
+export type Lecture = {
+    id: string;
+    title: string;
+    videoUrl?: string;
+    pdfUrl?: string;
+};
+
+export type Quiz = {
+    id: string;
+    question: string;
+    options: string[];
+    correctAnswer: string;
+}
+
+type Course = {
+    id: string;
+    name: string;
+    description: string;
+    author: string; // Assuming author is stored in the course doc
+    rating: number; // Assuming rating is stored
+};
+
+async function getCourseData(id: string): Promise<{ course: Course, subcategories: Subcategory[] } | null> {
+    try {
+        const courseRef = doc(db, 'courses', id);
+        const courseSnap = await getDoc(courseRef);
+
+        if (!courseSnap.exists()) {
+            return null;
+        }
+
+        const courseData = courseSnap.data();
+        const course: Course = {
+            id: courseSnap.id,
+            name: courseData.name || 'Unnamed Course',
+            description: courseData.description || '',
+            author: 'PixS Organisation', // Placeholder
+            rating: 4.8, // Placeholder
+        };
+
+        const subcategoriesRef = collection(db, 'courses', id, 'subcategories');
+        const subcategoriesQuery = query(subcategoriesRef, orderBy('name'));
+        const subcategoriesSnap = await getDocs(subcategoriesQuery);
+        
+        const subcategories: Subcategory[] = subcategoriesSnap.docs.map(doc => ({
+            id: doc.id,
+            name: doc.data().name || 'Unnamed Subcategory',
+            description: doc.data().description || '',
+        }));
+
+        return { course, subcategories };
+    } catch (error) {
+        console.error("Error fetching course data:", error);
+        return null;
     }
-  ].filter(tab => tab.enabled);
-
-  return (
-     <div className="bg-card/50">
-      <div className="container mx-auto px-4 py-12 md:py-24">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <div className="mb-4">
-              <Badge variant="secondary" className="mb-2">{course.author}</Badge>
-              <h1 className="font-headline text-4xl font-bold tracking-tight text-primary lg:text-5xl">
-                {course.title}
-              </h1>
-              <p className="mt-4 text-lg text-foreground/80">
-                {course.description}
-              </p>
-            </div>
-            
-            <div className="mt-8 rounded-lg border bg-card shadow-sm">
-                <Tabs defaultValue={tabbedContent[0]?.value} className="w-full">
-                  <TabsList className={`grid w-full grid-cols-4 m-2`}>
-                    {tabbedContent.map(tab => (
-                       <TabsTrigger key={tab.value} value={tab.value}>
-                        <tab.icon className="mr-2 h-5 w-5" />
-                        {tab.label}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                  {tabbedContent.map(tab => (
-                    <TabsContent key={tab.value} value={tab.value}>
-                      {tab.content}
-                    </TabsContent>
-                  ))}
-                </Tabs>
-            </div>
-
-          </div>
-          <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-lg border bg-card p-6 shadow-sm">
-                 <h2 className="font-headline text-2xl font-semibold mb-4">
-                  About this course
-                </h2>
-                <p className="text-foreground/70">{course.longDescription}</p>
-
-                <div className="mt-6 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <UserCircle className="h-5 w-5 text-muted-foreground" />
-                    <span className="font-medium">{course.author}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-5 w-5 text-yellow-400" fill="currentColor" />
-                    <span className="font-bold">{course.rating.toFixed(1)}</span>
-                  </div>
-                </div>
-
-                <div className="mt-6 flex flex-col gap-2">
-                   {course.isDownloadable && (
-                      <Button className="w-full font-semibold" size="lg">
-                        <Download className="mr-2 h-5 w-5" />
-                        Download Materials
-                      </Button>
-                    )}
-                    <Button variant="outline" className="w-full font-semibold" size="lg">
-                        <Heart className="mr-2 h-5 w-5" />
-                        Save for Later
-                    </Button>
-                </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
 }
 
 
-export default async function CoursePageWrapper({ params }: { params: { id: string } }) {
-  const course = getCourseById(params.id);
+export default async function CoursePage({ params }: { params: { id: string } }) {
+    const data = await getCourseData(params.id);
 
-  if (!course) {
-    notFound();
-  }
+    if (!data) {
+        notFound();
+    }
 
-  return <CourseContent course={course} allCourses={courses} />;
+    const { course, subcategories } = data;
+    
+    // The main data fetching happens on the server. We pass the initial data to the client component.
+    return (
+        <div className="bg-card/50">
+            <div className="container mx-auto px-4 py-12 md:py-24">
+                <div className="grid grid-cols-1 gap-12 lg:grid-cols-3">
+                    <div className="lg:col-span-2">
+                        <div className="mb-4">
+                            <Badge variant="secondary" className="mb-2">{course.author}</Badge>
+                            <h1 className="font-headline text-4xl font-bold tracking-tight text-primary lg:text-5xl">
+                                {course.name}
+                            </h1>
+                            <p className="mt-4 text-lg text-foreground/80">
+                                {course.description}
+                            </p>
+                        </div>
+
+                        {/* Client Component for interactive tabs */}
+                        <SubcategoryClientPage courseId={course.id} initialSubcategories={subcategories} />
+
+                    </div>
+                    <div className="lg:col-span-1">
+                        <div className="sticky top-24 rounded-lg border bg-card p-6 shadow-sm">
+                            <h2 className="font-headline text-2xl font-semibold mb-4">
+                                About this category
+                            </h2>
+                            <p className="text-foreground/70">{course.description}</p>
+
+                            <div className="mt-6 flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <UserCircle className="h-5 w-5 text-muted-foreground" />
+                                    <span className="font-medium">{course.author}</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    <Star className="h-5 w-5 text-yellow-400" fill="currentColor" />
+                                    <span className="font-bold">{course.rating.toFixed(1)}</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 flex flex-col gap-2">
+                                <Button className="w-full font-semibold" size="lg">
+                                    <Download className="mr-2 h-5 w-5" />
+                                    Download Materials
+                                </Button>
+                                <Button variant="outline" className="w-full font-semibold" size="lg">
+                                    <Heart className="mr-2 h-5 w-5" />
+                                    Save for Later
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 }
