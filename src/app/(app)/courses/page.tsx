@@ -6,24 +6,15 @@ import CourseCard from '@/components/course-card';
 import { courses } from '@/lib/courses';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
-const courseCategories = [
-  'All',
-  ...Array.from(new Set(courses.map(course => course.category))),
-];
 
 export default function CoursesPage() {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
 
   const filteredCourses = courses.filter(course => {
-    const matchesCategory =
-      selectedCategory === 'All' || course.category === selectedCategory;
     const matchesSearch =
       course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       course.description.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesCategory && matchesSearch;
+    return matchesSearch;
   });
 
   return (
@@ -50,19 +41,6 @@ export default function CoursesPage() {
                 onChange={e => setSearchTerm(e.target.value)}
               />
             </div>
-            <Tabs
-              defaultValue="All"
-              className="w-full max-w-4xl"
-              onValueChange={setSelectedCategory}
-            >
-              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-                {courseCategories.map(category => (
-                  <TabsTrigger key={category} value={category}>
-                    {category}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
           </div>
           
           <div className="mt-16 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-y-16">
@@ -73,7 +51,7 @@ export default function CoursesPage() {
             ) : (
                 <div className="col-span-full text-center text-muted-foreground py-16">
                   <h3 className="text-2xl font-semibold">No Courses Found</h3>
-                  <p className="mt-2">Try adjusting your search or category.</p>
+                  <p className="mt-2">Try adjusting your search.</p>
                 </div>
             )}
           </div>
