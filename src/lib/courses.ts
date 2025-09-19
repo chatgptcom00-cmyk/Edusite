@@ -1,3 +1,4 @@
+
 import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat, FileText, Briefcase, Puzzle, LucideProps, Download, BookOpen, GraduationCap, Lightbulb, Target, Rocket, BarChart, Globe, Database, Film } from "lucide-react";
 import { FC, ForwardRefExoticComponent, RefAttributes } from "react";
 
@@ -51,6 +52,7 @@ export type Course = {
     quiz: boolean;
   }
   isDownloadable: boolean;
+  category: string;
 };
 
 export const courses: Course[] = [
@@ -79,6 +81,7 @@ export const courses: Course[] = [
         quiz: false,
     },
     isDownloadable: true,
+    category: 'Development',
   },
   {
     id: '2',
@@ -105,6 +108,7 @@ export const courses: Course[] = [
         quiz: true,
     },
     isDownloadable: false,
+    category: 'Design',
   },
   {
     id: '3',
@@ -131,6 +135,7 @@ export const courses: Course[] = [
         quiz: true,
     },
     isDownloadable: true,
+    category: 'Data Science',
   },
     {
     id: '4',
@@ -157,6 +162,7 @@ export const courses: Course[] = [
         quiz: true,
     },
     isDownloadable: false,
+    category: 'Personal Development',
   },
   {
     id: '5',
@@ -183,6 +189,7 @@ export const courses: Course[] = [
         quiz: false,
     },
     isDownloadable: true,
+    category: 'Creative Arts',
   },
   {
     id: '6',
@@ -209,6 +216,7 @@ export const courses: Course[] = [
         quiz: true,
     },
     isDownloadable: false,
+    category: 'Creative Arts',
   }
 ];
 
