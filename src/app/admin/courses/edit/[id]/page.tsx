@@ -3,7 +3,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { courses, getCourseById, iconMap, Course } from '@/lib/courses';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -15,64 +16,93 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, UploadCloud } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+
+type Course = {
+  name: string;
+  description: string;
+};
 
 export default function EditCoursePage() {
   const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
+  const courseId = params.id as string;
 
   const [course, setCourse] = useState<Course | null>(null);
-  const [icon, setIcon] = useState('');
-  const [iconColor, setIconColor] = useState('');
-  const [isDownloadable, setIsDownloadable] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    const courseId = params.id as string;
-    const foundCourse = getCourseById(courseId);
-    if (foundCourse) {
-      setCourse(foundCourse);
-      setIcon(foundCourse.icon);
-      setIconColor(foundCourse.iconColor);
-      setIsDownloadable(foundCourse.isDownloadable);
-    } else {
-      // Handle course not found, maybe redirect
-    }
-  }, [params.id]);
+    if (!courseId) return;
 
-  const handleSave = () => {
-    if (course) {
-      // In a real app, you would save this to your database.
-      // For now, we'll just show a toast.
-      console.log('Saving changes:', {
-        ...course,
-        icon,
-        iconColor,
-        isDownloadable,
+    const fetchCourse = async () => {
+      setIsLoading(true);
+      try {
+        const docRef = doc(db, 'courses', courseId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          setCourse(docSnap.data() as Course);
+        } else {
+          toast({
+            variant: 'destructive',
+            title: 'Not Found',
+            description: 'This course does not exist.',
+          });
+          router.push('/admin/courses');
+        }
+      } catch (error) {
+        console.error('Error fetching course:', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to load course data.',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCourse();
+  }, [courseId, router, toast]);
+
+  const handleSave = async () => {
+    if (!course) return;
+
+    setIsSaving(true);
+    try {
+      const docRef = doc(db, 'courses', courseId);
+      await updateDoc(docRef, {
+        name: course.name,
+        description: course.description,
       });
       toast({
-        title: 'Course Saved!',
-        description: `${course.title} has been updated.`,
+        title: 'Course Updated!',
+        description: 'The changes have been saved successfully.',
       });
-      // Note: This won't persist because the `courses` array is in-memory.
+    } catch (error) {
+      console.error('Error updating course:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to save changes.',
+      });
+    } finally {
+      setIsSaving(false);
     }
   };
-
-  if (!course) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p>Loading course...</p>
-      </div>
-    );
+  
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    if (course) {
+        setCourse(prev => prev ? { ...prev, [name]: value } : null);
+    }
   }
-
-  const IconPreview = iconMap[icon as keyof typeof iconMap];
-  const iconNames = Object.keys(iconMap);
 
   return (
     <div className="space-y-6">
@@ -85,108 +115,79 @@ export default function EditCoursePage() {
         </Button>
         <h1 className="font-headline text-3xl font-bold">Edit Course</h1>
       </div>
+
       <Card>
-        <CardHeader>
-          <CardTitle>{course.title}</CardTitle>
-          <CardDescription>
-            Update the icon, branding, and settings for this course.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          <div className="space-y-4">
-             <div className="flex items-start gap-8">
+        {isLoading ? (
+          <CardContent className="p-6 space-y-6">
+            <Skeleton className="h-8 w-1/2" />
+            <Skeleton className="h-5 w-3/4" />
+            <div className="space-y-4 pt-4">
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-4">
+              <Skeleton className="h-6 w-24" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          </CardContent>
+        ) : course ? (
+          <>
+            <CardHeader>
+              <CardTitle>Editing: {course.name}</CardTitle>
+              <CardDescription>
+                Update the details for this main course category.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label>Icon Preview</Label>
-                <div
-                  className="flex h-24 w-24 items-center justify-center rounded-lg"
-                  style={{ backgroundColor: iconColor }}
-                >
-                  {IconPreview && (
-                    <IconPreview className="h-12 w-12 text-white" />
-                  )}
-                </div>
-              </div>
-              <div className="flex-1 space-y-2">
-                 <Label htmlFor="icon-color">Icon Color</Label>
+                <Label htmlFor="name">Course Name</Label>
                 <Input
-                  id="icon-color"
-                  type="color"
-                  value={iconColor}
-                  onChange={e => setIconColor(e.target.value)}
-                  className="h-12"
+                  id="name"
+                  name="name"
+                  value={course.name}
+                  onChange={handleInputChange}
+                  disabled={isSaving}
                 />
               </div>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            <Label>Choose an Icon</Label>
-            <ScrollArea className="w-full">
-              <div className="grid grid-cols-6 gap-4 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12">
-                {iconNames.map(iconName => {
-                  const IconComponent = iconMap[iconName];
-                  return (
-                    <button
-                      key={iconName}
-                      onClick={() => setIcon(iconName)}
-                      className={cn(
-                        "flex flex-col items-center justify-center gap-2 rounded-lg border p-4 transition-colors",
-                        icon === iconName ? "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2" : "hover:bg-accent hover:text-accent-foreground"
-                      )}
-                    >
-                      <IconComponent className="h-6 w-6" />
-                      <span className="text-xs truncate">{iconName}</span>
-                    </button>
-                  );
-                })}
+              <div className="space-y-2">
+                <Label htmlFor="description">Course Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  value={course.description}
+                  onChange={handleInputChange}
+                  rows={4}
+                  disabled={isSaving}
+                />
               </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-          </div>
-          
-           <div className="space-y-2">
-            <Label>Or Upload Custom Icon</Label>
-            <div className="flex w-full items-center justify-center">
-              <label
-                htmlFor="logo-upload"
-                className="flex h-32 w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed bg-muted hover:bg-secondary"
+            </CardContent>
+            <CardFooter>
+              <Button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="font-semibold"
+                size="lg"
               >
-                <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <UploadCloud className="mb-2 h-6 w-6 text-muted-foreground" />
-                  <p className="mb-1 text-sm text-muted-foreground">
-                    <span className="font-semibold">Click to upload</span>
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    SVG, PNG, or JPG
-                  </p>
-                </div>
-                <Input id="logo-upload" type="file" className="hidden" />
-              </label>
-            </div>
-          </div>
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </Button>
+            </CardFooter>
+          </>
+        ) : (
+          <CardContent className="p-6 text-center">
+            <p>Course data could not be loaded.</p>
+          </CardContent>
+        )}
+      </Card>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Course Settings</h3>
-            <div className="flex items-center justify-between rounded-lg border p-4">
-              <div>
-                <Label htmlFor="downloadable">Downloadable Content</Label>
-                <p className="text-sm text-muted-foreground">
-                  Allow users to download course materials.
-                </p>
-              </div>
-              <Switch
-                id="downloadable"
-                checked={isDownloadable}
-                onCheckedChange={setIsDownloadable}
-              />
-            </div>
-          </div>
+      {/* Placeholder for future subcategory management */}
+      <Card>
+        <CardHeader>
+            <CardTitle>Subcategories</CardTitle>
+            <CardDescription>Manage subcategories for this course.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <p className="text-muted-foreground text-center py-8">Subcategory management will be added here.</p>
         </CardContent>
-        <CardFooter>
-          <Button onClick={handleSave} className="font-semibold" size="lg">
-            Save Changes
-          </Button>
-        </CardFooter>
       </Card>
     </div>
   );

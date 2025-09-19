@@ -3,7 +3,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { courses, iconMap } from '@/lib/courses';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -20,12 +21,21 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Edit } from 'lucide-react';
+import { Edit, BookCopy } from 'lucide-react';
 import Link from 'next/link';
+import { Skeleton } from '@/components/ui/skeleton';
+
+type Course = {
+  id: string;
+  name: string;
+  description: string;
+};
 
 export default function AdminCoursesPage() {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const session = localStorage.getItem('admin-auth');
@@ -33,8 +43,27 @@ export default function AdminCoursesPage() {
       router.push('/wp-admin');
     } else {
       setIsAuthenticated(true);
+      fetchCourses();
     }
   }, [router]);
+
+  async function fetchCourses() {
+    setIsLoading(true);
+    try {
+      const q = query(collection(db, 'courses'), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const coursesData = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name,
+        description: doc.data().description,
+      }));
+      setCourses(coursesData);
+    } catch (error) {
+      console.error('Error fetching courses: ', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   if (!isAuthenticated) {
     return (
@@ -52,37 +81,44 @@ export default function AdminCoursesPage() {
             Manage Courses
           </CardTitle>
           <CardDescription>
-            Review and edit existing course details and logos.
+            Review and edit main course categories from Firestore.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Course</TableHead>
+                <TableHead>Course Name</TableHead>
+                <TableHead className="hidden md:table-cell">Description</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {courses.map(course => {
-                const Icon = iconMap[course.icon];
-                return (
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, index) => (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Skeleton className="h-5 w-48" />
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      <Skeleton className="h-5 w-full" />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Skeleton className="h-8 w-20 ml-auto" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : courses.length > 0 ? (
+                courses.map(course => (
                   <TableRow key={course.id}>
                     <TableCell className="font-medium">
-                      <div className="flex items-center gap-4">
-                        <div
-                          className="flex h-16 w-16 items-center justify-center rounded-lg"
-                          style={{ backgroundColor: course.iconColor }}
-                        >
-                          <Icon className="h-8 w-8 text-white" />
-                        </div>
-                        <div>
-                          <p className="font-semibold">{course.title}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {course.description}
-                          </p>
-                        </div>
+                      <div className="flex items-center gap-3">
+                        <BookCopy className="h-5 w-5 text-muted-foreground" />
+                        <span>{course.name}</span>
                       </div>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell max-w-sm truncate">
+                      {course.description}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button variant="outline" size="sm" asChild>
@@ -93,8 +129,14 @@ export default function AdminCoursesPage() {
                       </Button>
                     </TableCell>
                   </TableRow>
-                );
-              })}
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} className="h-24 text-center">
+                    No courses found in Firestore. Add one from the dashboard.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
