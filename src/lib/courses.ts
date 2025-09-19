@@ -1,5 +1,5 @@
 
-import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat, FileText, Briefcase, Puzzle, LucideProps, Download, BookOpen, GraduationCap, Lightbulb, Target, Rocket, BarChart, Globe, Database, Film } from "lucide-react";
+import { Code, Palette, BrainCircuit, HeartHandshake, Camera, ChefHat, FileText, Briefcase, Puzzle, LucideProps, Download, BookOpen, GraduationCap, Lightbulb, Target, Rocket, BarChart, Globe, Database, Film, Users, PenTool } from "lucide-react";
 import { FC, ForwardRefExoticComponent, RefAttributes } from "react";
 
 export type CourseModule = {
@@ -30,6 +30,8 @@ export const iconMap: { [key: string]: IconComponent } = {
   Globe,
   Database,
   Film,
+  Users,
+  PenTool,
 };
 
 export type Course = {
@@ -217,9 +219,55 @@ export const courses: Course[] = [
     },
     isDownloadable: false,
     category: 'Creative Arts',
-  }
+  },
+  {
+    id: '7',
+    title: 'Advanced Prototyping in Figma',
+    description: 'Create interactive and high-fidelity prototypes with Figma.',
+    longDescription: 'Take your Figma skills to the next level. This course covers advanced features like variants, auto layout, and smart animate to build complex, responsive, and interactive prototypes that feel like real applications.',
+    imageUrl: 'https://picsum.photos/seed/course7/600/400',
+    imageHint: 'prototyping design',
+    author: 'Alex Johnson',
+    rating: 4.8,
+    videoUrl: 'https://example.com/video7',
+    modules: [
+      { title: 'Figma Auto Layout Deep Dive', duration: '40:00', type: 'video' },
+      { title: 'Creating Component Variants', duration: '35:15', type: 'video' },
+      { title: 'Smart Animate for Microinteractions', duration: '30:00', type: 'article' },
+      { title: 'Building a Full Prototype', duration: '75:00', type: 'video' },
+    ],
+    icon: 'PenTool',
+    iconColor: 'hsl(var(--chart-1))',
+    features: { videos: true, documents: true, practical: true, quiz: true },
+    isDownloadable: true,
+    category: 'Design',
+  },
+  {
+    id: '8',
+    title: 'User Research for UX',
+    description: 'Master the techniques to understand your users and inform your design decisions.',
+    longDescription: 'A great user experience starts with understanding your users. This course teaches you how to plan and conduct user interviews, create surveys, and analyze feedback to build products people love.',
+    imageUrl: 'https://picsum.photos/seed/course8/600/400',
+    imageHint: 'user research',
+    author: 'Samantha Lee',
+    rating: 4.9,
+    videoUrl: 'https://example.com/video8',
+    modules: [
+      { title: 'Introduction to User Research', duration: '20:00', type: 'video' },
+      { title: 'Conducting Effective Interviews', duration: '45:00', type: 'video' },
+      { title: 'Crafting User Surveys', duration: '30:00', type: 'article' },
+      { title: 'Synthesizing Research into Insights', duration: '50:00', type: 'video' },
+    ],
+    icon: 'Users',
+    iconColor: 'hsl(var(--chart-4))',
+    features: { videos: true, documents: true, practical: false, quiz: true },
+    isDownloadable: false,
+    category: 'Design',
+  },
 ];
 
 export const getCourseById = (id: string | number): Course | undefined => {
   return courses.find(course => course.id === String(id));
 };
+
+    
