@@ -66,8 +66,8 @@ export default function AdminPage() {
         createdAt: new Date(),
       });
       toast({
-        title: 'Course Added!',
-        description: 'The new course has been successfully created.',
+        title: 'Category Added!',
+        description: 'The new category has been successfully created.',
       });
       setCourseTitle('');
       setCourseDescription('');
@@ -77,7 +77,7 @@ export default function AdminPage() {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Something went wrong while adding the course.',
+        description: 'Something went wrong while adding the category.',
       });
     } finally {
       setIsSubmitting(false);
@@ -97,7 +97,7 @@ export default function AdminPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Courses</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Categories</CardTitle>
             <BookOpen className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -129,16 +129,16 @@ export default function AdminPage() {
           <Card>
             <CardHeader>
               <CardTitle className="font-headline text-2xl">
-                Add New Main Course
+                Add New Main Category
               </CardTitle>
               <CardDescription>
-                Create a new main course category in Firestore.
+                Create a new main category in Firestore.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-6" onSubmit={handleAddCourse}>
                 <div className="space-y-2">
-                  <Label htmlFor="title">Course Name</Label>
+                  <Label htmlFor="title">Category Name</Label>
                   <Input
                     id="title"
                     placeholder="e.g., Advanced Web Development"
@@ -148,10 +148,10 @@ export default function AdminPage() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Course Description</Label>
+                  <Label htmlFor="description">Category Description</Label>
                   <Textarea
                     id="description"
-                    placeholder="A short summary of the course."
+                    placeholder="A short summary of the category."
                     value={courseDescription}
                     onChange={e => setCourseDescription(e.target.value)}
                     disabled={isSubmitting}
@@ -163,7 +163,7 @@ export default function AdminPage() {
                   size="lg"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? 'Adding...' : 'Add Course to Firestore'}
+                  {isSubmitting ? 'Adding...' : 'Add Category to Firestore'}
                 </Button>
               </form>
             </CardContent>

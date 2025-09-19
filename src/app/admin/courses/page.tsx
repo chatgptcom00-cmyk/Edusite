@@ -59,7 +59,7 @@ export default function AdminCoursesPage() {
       }));
       setCourses(coursesData);
     } catch (error) {
-      console.error('Error fetching courses: ', error);
+      console.error('Error fetching categories: ', error);
     } finally {
       setIsLoading(false);
     }
@@ -78,7 +78,7 @@ export default function AdminCoursesPage() {
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-2xl">
-            Manage Courses
+            Manage Categories
           </CardTitle>
           <CardDescription>
             Review and edit main course categories from Firestore.
@@ -88,7 +88,7 @@ export default function AdminCoursesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Course Name</TableHead>
+                <TableHead>Category Name</TableHead>
                 <TableHead className="hidden md:table-cell">Description</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -133,7 +133,7 @@ export default function AdminCoursesPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={3} className="h-24 text-center">
-                    No courses found in Firestore. Add one from the dashboard.
+                    No categories found in Firestore. Add one from the dashboard.
                   </TableCell>
                 </TableRow>
               )}

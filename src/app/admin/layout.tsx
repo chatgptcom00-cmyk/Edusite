@@ -37,7 +37,7 @@ import '../globals.css';
 
 const menuItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/courses', label: 'Courses', icon: Book },
+  { href: '/admin/courses', label: 'Category', icon: Book },
   { href: '/admin/settings', label: 'Settings', icon: Settings },
 ];
 
