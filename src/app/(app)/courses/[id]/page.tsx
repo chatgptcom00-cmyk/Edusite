@@ -89,7 +89,7 @@ async function CourseContent({ course, allCourses }: { course: Course; allCourse
             
             <div className="mt-8 rounded-lg border bg-card shadow-sm">
                 <Tabs defaultValue={tabbedContent[0]?.value} className="w-full">
-                  <TabsList className={`grid w-full grid-cols-${tabbedContent.length} m-2`}>
+                  <TabsList className={`grid w-full grid-cols-4 m-2`}>
                     {tabbedContent.map(tab => (
                        <TabsTrigger key={tab.value} value={tab.value}>
                         <tab.icon className="mr-2 h-5 w-5" />
