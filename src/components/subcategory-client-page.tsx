@@ -10,7 +10,6 @@ import {
   doc,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import type { Subcategory, Lecture, Quiz } from '@/app/(app)/courses/[id]/page';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Accordion,
@@ -19,8 +18,28 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Skeleton } from '@/components/ui/skeleton';
-import { PlayCircle, FileText, Puzzle, Clock, CheckCircle2 } from 'lucide-react';
+import { PlayCircle, FileText, Puzzle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
+
+export type Subcategory = {
+    id: string;
+    name: string;
+    description: string;
+};
+
+export type Lecture = {
+    id: string;
+    title: string;
+    videoUrl?: string;
+    pdfUrl?: string;
+};
+
+export type Quiz = {
+    id: string;
+    question: string;
+    options: string[];
+    correctAnswer: string;
+}
 
 type SubcategoryClientPageProps = {
   courseId: string;
@@ -45,7 +64,7 @@ export default function SubcategoryClientPage({
         try {
           // Fetch lectures
           const lecturesRef = collection(db, 'courses', courseId, 'subcategories', activeSubcategoryId, 'courses');
-          const lecturesQuery = query(lecturesRef, orderBy('title'));
+          const lecturesQuery = query(lecturesRef, orderBy('title', 'asc'));
           const lecturesSnap = await getDocs(lecturesQuery);
           const lecturesData = lecturesSnap.docs.map(doc => ({
             id: doc.id,
@@ -55,7 +74,7 @@ export default function SubcategoryClientPage({
 
           // Fetch quizzes
           const quizzesRef = collection(db, 'courses', courseId, 'subcategories', activeSubcategoryId, 'quizzes');
-          const quizzesQuery = query(quizzesRef, orderBy('question'));
+          const quizzesQuery = query(quizzesRef, orderBy('question', 'asc'));
           const quizzesSnap = await getDocs(quizzesQuery);
           const quizzesData = quizzesSnap.docs.map(doc => ({
             id: doc.id,
@@ -90,16 +109,16 @@ export default function SubcategoryClientPage({
   )
 
   const renderLectures = () => (
-    <Accordion type="single" collapsible className="w-full mt-4">
+    <Accordion type="single" collapsible className="w-full">
       {lectures.map((lecture, index) => (
-        <AccordionItem key={index} value={`item-${index}`}>
+        <AccordionItem key={index} value={`item-${index}`} className="px-6">
           <AccordionTrigger className="font-medium hover:no-underline">
             <div className="flex items-center gap-3">
               <CheckCircle2 className={`h-6 w-6 transition-colors text-muted-foreground`} />
               <span>{lecture.title}</span>
             </div>
           </AccordionTrigger>
-          <AccordionContent className="pl-14">
+          <AccordionContent className="pl-12 pb-4">
             {lecture.videoUrl && (
                 <Link href={lecture.videoUrl} target="_blank" className="text-primary hover:underline flex items-center gap-2">
                     <PlayCircle className="h-4 w-4" /> Watch Video
@@ -120,7 +139,7 @@ export default function SubcategoryClientPage({
   );
 
   const renderQuizzes = () => (
-     <div className="mt-4 space-y-4">
+     <div className="p-6 space-y-4">
         {quizzes.map((quiz, index) => (
             <div key={index} className="rounded-lg border p-4">
                 <p className="font-medium">{index + 1}. {quiz.question}</p>
@@ -139,6 +158,7 @@ export default function SubcategoryClientPage({
 
   return (
     <div className="mt-8 rounded-lg border bg-card shadow-sm">
+      {initialSubcategories.length > 0 ? (
         <Tabs defaultValue={initialSubcategories[0]?.id} onValueChange={setActiveSubcategoryId} className="w-full">
             <TabsList className="m-2">
                 {initialSubcategories.map(sub => (
@@ -150,9 +170,11 @@ export default function SubcategoryClientPage({
             
             {initialSubcategories.map(sub => (
                 <TabsContent key={sub.id} value={sub.id} className="p-0">
-                    <p className="text-muted-foreground px-6 pb-4">{sub.description}</p>
+                    <div className="border-b">
+                        <p className="text-muted-foreground px-6 pb-4">{sub.description}</p>
+                    </div>
                     <Tabs defaultValue="lectures" className="w-full">
-                        <TabsList className="grid w-full grid-cols-2 m-0 border-t rounded-none">
+                        <TabsList className="grid w-full grid-cols-2 m-0 rounded-none border-b">
                             {renderContent}
                         </TabsList>
                         {isLoading ? (
@@ -163,10 +185,10 @@ export default function SubcategoryClientPage({
                             </div>
                         ) : (
                             <>
-                                <TabsContent value="lectures">
+                                <TabsContent value="lectures" className="p-0">
                                     {lectures.length > 0 ? renderLectures() : <p className="p-6 text-center text-muted-foreground">No lectures available for this subcategory.</p>}
                                 </TabsContent>
-                                <TabsContent value="quizzes">
+                                <TabsContent value="quizzes" className="p-0">
                                     {quizzes.length > 0 ? renderQuizzes() : <p className="p-6 text-center text-muted-foreground">No quizzes available for this subcategory.</p>}
                                 </TabsContent>
                             </>
@@ -175,6 +197,12 @@ export default function SubcategoryClientPage({
                 </TabsContent>
             ))}
         </Tabs>
+      ) : (
+        <div className="p-8 text-center text-muted-foreground">
+          <p>No subcategories have been added to this course yet.</p>
+        </div>
+      )}
     </div>
   );
 }
+

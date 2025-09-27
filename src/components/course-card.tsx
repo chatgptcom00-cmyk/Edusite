@@ -1,3 +1,4 @@
+
 import { Course, iconMap } from '@/lib/courses';
 import Link from 'next/link';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +12,7 @@ export default function CourseCard({ course }: CourseCardProps) {
   const Icon = iconMap[course.icon];
   return (
     <Link href={`/courses/${course.id}`} className="group">
-      <Card className="h-full overflow-hidden transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2 bg-white rounded-2xl shadow-lg">
+      <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-2 bg-card rounded-2xl shadow-lg">
         <CardHeader className="pt-8 pb-4">
           <div className='flex justify-center items-center'>
             <div
@@ -24,7 +25,7 @@ export default function CourseCard({ course }: CourseCardProps) {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-6 text-center">
+        <CardContent className="p-6 text-center flex-1">
            <CardTitle className="mt-2 font-headline text-2xl font-semibold leading-tight">
             {course.title}
           </CardTitle>
@@ -32,15 +33,15 @@ export default function CourseCard({ course }: CourseCardProps) {
             {course.description}
           </p>
         </CardContent>
-        <CardFooter className='flex-col pb-8'>
+        <CardFooter className='flex-col pb-8 pt-4'>
           <Button 
             className="font-semibold text-lg py-6 px-8 rounded-full" 
             style={{
-              background: 'linear-gradient(to right, #6b63b5, #4e4685)',
-              color: 'white'
+              background: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
+              color: 'hsl(var(--primary-foreground))'
             }}
           >
-            Learn More
+            View Courses
           </Button>
         </CardFooter>
       </Card>

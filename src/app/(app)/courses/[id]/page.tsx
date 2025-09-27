@@ -55,7 +55,8 @@ async function getCourseData(id: string): Promise<{ course: Course, subcategorie
         };
 
         const subcategoriesRef = collection(db, 'courses', id, 'subcategories');
-        const subcategoriesQuery = query(subcategoriesRef, orderBy('name'));
+        // Note: Firestore requires an index for orderBy. If you see an error in browser console, follow the link to create it.
+        const subcategoriesQuery = query(subcategoriesRef, orderBy('name', 'asc'));
         const subcategoriesSnap = await getDocs(subcategoriesQuery);
         
         const subcategories: Subcategory[] = subcategoriesSnap.docs.map(doc => ({
@@ -67,6 +68,7 @@ async function getCourseData(id: string): Promise<{ course: Course, subcategorie
         return { course, subcategories };
     } catch (error) {
         console.error("Error fetching course data:", error);
+        // This will return null and trigger a 404, which is okay if the index isn't ready.
         return null;
     }
 }
