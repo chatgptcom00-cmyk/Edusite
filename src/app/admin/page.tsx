@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { useFirestore } from '@/firebase';
 import { courses as staticCourses } from '@/lib/courses';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { BookOpen, TrendingUp } from 'lucide-react';
+import { addDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -65,29 +66,23 @@ export default function AdminPage() {
       return;
     }
     setIsSubmitting(true);
-    try {
-      await addDoc(collection(firestore, 'courses'), {
+    
+    const coursesCollection = collection(firestore, 'courses');
+    
+    addDocumentNonBlocking(coursesCollection, {
         name: courseTitle,
         description: courseDescription,
-        createdAt: new Date(),
-      });
-      toast({
+        createdAt: serverTimestamp(),
+    });
+
+    toast({
         title: 'Category Added!',
         description: 'The new category has been successfully created.',
-      });
-      setCourseTitle('');
-      setCourseDescription('');
-      setCourseCount(prev => prev + 1); // Increment count
-    } catch (error) {
-      console.error('Error adding document: ', error);
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'Something went wrong while adding the category.',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
+    setCourseTitle('');
+    setCourseDescription('');
+    setCourseCount(prev => prev + 1);
+    setIsSubmitting(false);
   };
 
   if (!isAuthenticated) {
