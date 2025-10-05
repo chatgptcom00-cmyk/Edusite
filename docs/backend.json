@@ -1,0 +1,199 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the CourseForge platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        },
+        "isAdmin": {
+          "type": "boolean",
+          "description": "Indicates if the user has administrator privileges."
+        },
+        "googleId": {
+          "type": "string",
+          "description": "Google identifier for the user, used for login with Google."
+        }
+      },
+      "required": [
+        "id",
+        "firstName",
+        "lastName",
+        "email",
+        "isAdmin"
+      ]
+    },
+    "Course": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Course",
+      "type": "object",
+      "description": "Represents a course available on the CourseForge platform.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Course entity."
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the course."
+        },
+        "description": {
+          "type": "string",
+          "description": "Brief description of the course."
+        },
+        "contentUrl": {
+          "type": "string",
+          "description": "URL to the course content.",
+          "format": "uri"
+        },
+        "mediaUrl": {
+          "type": "string",
+          "description": "URL to the course media (image or video).",
+          "format": "uri"
+        },
+        "creatorId": {
+          "type": "string",
+          "description": "Reference to User who created the course. (Relationship: User 1:N Course)"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "description",
+        "contentUrl",
+        "mediaUrl",
+        "creatorId"
+      ]
+    },
+    "UserCourseInteraction": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserCourseInteraction",
+      "type": "object",
+      "description": "Represents user interactions with courses, such as viewing history or favorites.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserCourseInteraction entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User. (Relationship: User 1:N UserCourseInteraction)"
+        },
+        "courseId": {
+          "type": "string",
+          "description": "Reference to the Course. (Relationship: Course 1:N UserCourseInteraction)"
+        },
+        "isFavorite": {
+          "type": "boolean",
+          "description": "Indicates if the user has marked the course as a favorite."
+        },
+        "lastViewed": {
+          "type": "string",
+          "description": "Timestamp of the last time the user viewed the course.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "courseId"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profiles. Uses path-based ownership for private user data.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/courses/{courseId}",
+        "definition": {
+          "entityName": "Course",
+          "schema": {
+            "$ref": "#/backend/entities/Course"
+          },
+          "description": "Stores course information. Accessible to all users for viewing, but only modifiable by admins.",
+          "params": [
+            {
+              "name": "courseId",
+              "description": "The unique identifier for the course."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/course_interactions/{interactionId}",
+        "definition": {
+          "entityName": "UserCourseInteraction",
+          "schema": {
+            "$ref": "#/backend/entities/UserCourseInteraction"
+          },
+          "description": "Stores user interactions with courses, such as favorites and last viewed timestamps. Uses path-based ownership to associate interactions with specific users.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user."
+            },
+            {
+              "name": "interactionId",
+              "description": "The unique identifier for the user-course interaction."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/roles_admin/{userId}",
+        "definition": {
+          "entityName": "roles_admin",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Collection to store admin roles. Document existence determines admin status. Existence over content.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user with admin privileges."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to accommodate user authentication with Google, admin-controlled course uploads, course listings, and user interaction tracking. It follows the principles of Authorization Independence, Structural Segregation, and Access Modeling for security and scalability.  Users are stored in a dedicated collection. Courses, which are managed by admins, are stored in a separate collection to clearly delineate responsibilities and improve security. UserCourseInteraction documents track user-course relationships and enable personalized recommendations. Path-based ownership is used for private user data, while admin-created courses are stored in a separate collection. Admin status is checked via the `roles_admin` collection. The structure facilitates secure listing because the admin status is checked using document existence (membership) instead of querying properties of documents."
+  }
+}
