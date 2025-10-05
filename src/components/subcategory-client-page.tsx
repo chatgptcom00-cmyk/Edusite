@@ -9,7 +9,7 @@ import {
   orderBy,
   doc,
 } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { useFirestore, useMemoFirebase } from '@/firebase';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Accordion,
@@ -50,50 +50,55 @@ export default function SubcategoryClientPage({
   courseId,
   initialSubcategories,
 }: SubcategoryClientPageProps) {
+  const firestore = useFirestore();
   const [activeSubcategoryId, setActiveSubcategoryId] = useState<string | null>(
     initialSubcategories[0]?.id || null
   );
   const [lectures, setLectures] = useState<Lecture[]>([]);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const activeSubcategoryRef = useMemoFirebase(() => {
+    if (!firestore || !courseId || !activeSubcategoryId) return null;
+    return doc(firestore, 'courses', courseId, 'subcategories', activeSubcategoryId);
+  }, [firestore, courseId, activeSubcategoryId]);
+
 
   useEffect(() => {
-    if (activeSubcategoryId) {
-      const fetchContent = async () => {
-        setIsLoading(true);
-        try {
-          // Fetch lectures
-          const lecturesRef = collection(db, 'courses', courseId, 'subcategories', activeSubcategoryId, 'courses');
-          const lecturesQuery = query(lecturesRef, orderBy('title', 'asc'));
-          const lecturesSnap = await getDocs(lecturesQuery);
-          const lecturesData = lecturesSnap.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          })) as Lecture[];
-          setLectures(lecturesData);
+    if (!activeSubcategoryRef) return;
+    
+    const fetchContent = async () => {
+      setIsLoading(true);
+      try {
+        const lecturesRef = collection(activeSubcategoryRef, 'courses');
+        const lecturesQuery = query(lecturesRef, orderBy('title', 'asc'));
+        const lecturesSnap = await getDocs(lecturesQuery);
+        const lecturesData = lecturesSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Lecture[];
+        setLectures(lecturesData);
 
-          // Fetch quizzes
-          const quizzesRef = collection(db, 'courses', courseId, 'subcategories', activeSubcategoryId, 'quizzes');
-          const quizzesQuery = query(quizzesRef, orderBy('question', 'asc'));
-          const quizzesSnap = await getDocs(quizzesQuery);
-          const quizzesData = quizzesSnap.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data(),
-          })) as Quiz[];
-          setQuizzes(quizzesData);
+        const quizzesRef = collection(activeSubcategoryRef, 'quizzes');
+        const quizzesQuery = query(quizzesRef, orderBy('question', 'asc'));
+        const quizzesSnap = await getDocs(quizzesQuery);
+        const quizzesData = quizzesSnap.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as Quiz[];
+        setQuizzes(quizzesData);
 
-        } catch (error) {
-          console.error('Error fetching subcategory content:', error);
-          setLectures([]);
-          setQuizzes([]);
-        } finally {
-          setIsLoading(false);
-        }
-      };
+      } catch (error) {
+        console.error('Error fetching subcategory content:', error);
+        setLectures([]);
+        setQuizzes([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-      fetchContent();
-    }
-  }, [activeSubcategoryId, courseId]);
+    fetchContent();
+  }, [activeSubcategoryRef]);
   
   const renderContent = (
     <>
@@ -205,4 +210,3 @@ export default function SubcategoryClientPage({
     </div>
   );
 }
-

@@ -1,11 +1,14 @@
 
+'use client';
+
 import { doc, getDoc, collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { useFirestore, useMemoFirebase } from '@/firebase';
 import { notFound } from 'next/navigation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Download, Heart, Star, UserCircle } from 'lucide-react';
 import SubcategoryClientPage from '@/components/subcategory-client-page';
+import { useEffect, useState } from 'react';
 
 
 export type Subcategory = {
@@ -14,76 +17,83 @@ export type Subcategory = {
     description: string;
 };
 
-export type Lecture = {
-    id: string;
-    title: string;
-    videoUrl?: string;
-    pdfUrl?: string;
-};
-
-export type Quiz = {
-    id: string;
-    question: string;
-    options: string[];
-    correctAnswer: string;
-}
-
 type Course = {
     id: string;
     name: string;
     description: string;
-    author: string; // Assuming author is stored in the course doc
-    rating: number; // Assuming rating is stored
+    author: string;
+    rating: number; 
 };
 
-async function getCourseData(id: string): Promise<{ course: Course, subcategories: Subcategory[] } | null> {
-    try {
-        const courseRef = doc(db, 'courses', id);
-        const courseSnap = await getDoc(courseRef);
 
-        if (!courseSnap.exists()) {
-            return null;
-        }
+export default function CoursePage({ params }: { params: { id: string } }) {
+    const firestore = useFirestore();
+    const [course, setCourse] = useState<Course | null>(null);
+    const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
 
-        const courseData = courseSnap.data();
-        const course: Course = {
-            id: courseSnap.id,
-            name: courseData.name || 'Unnamed Course',
-            description: courseData.description || '',
-            author: 'PixS Organisation', // Placeholder
-            rating: 4.8, // Placeholder
+    const courseRef = useMemoFirebase(() => {
+        if (!firestore) return null;
+        return doc(firestore, 'courses', params.id);
+    }, [firestore, params.id]);
+
+    const subcategoriesRef = useMemoFirebase(() => {
+        if (!courseRef) return null;
+        return collection(courseRef, 'subcategories');
+    }, [courseRef]);
+
+    useEffect(() => {
+        if (!courseRef || !subcategoriesRef) return;
+
+        const fetchData = async () => {
+            setIsLoading(true);
+            try {
+                const courseSnap = await getDoc(courseRef);
+                if (!courseSnap.exists()) {
+                    notFound();
+                    return;
+                }
+
+                const courseData = courseSnap.data();
+                setCourse({
+                    id: courseSnap.id,
+                    name: courseData.name || 'Unnamed Course',
+                    description: courseData.description || '',
+                    author: 'PixS Organisation',
+                    rating: 4.8, 
+                });
+
+                const subcategoriesQuery = query(subcategoriesRef, orderBy('name', 'asc'));
+                const subcategoriesSnap = await getDocs(subcategoriesQuery);
+                const subcategoriesData: Subcategory[] = subcategoriesSnap.docs.map(doc => ({
+                    id: doc.id,
+                    name: doc.data().name || 'Unnamed Subcategory',
+                    description: doc.data().description || '',
+                }));
+                setSubcategories(subcategoriesData);
+
+            } catch (error) {
+                console.error("Error fetching course data:", error);
+                // In a real app, you might want to show an error state
+                setCourse(null);
+                setSubcategories([]);
+            } finally {
+                setIsLoading(false);
+            }
         };
 
-        const subcategoriesRef = collection(db, 'courses', id, 'subcategories');
-        // Note: Firestore requires an index for orderBy. If you see an error in browser console, follow the link to create it.
-        const subcategoriesQuery = query(subcategoriesRef, orderBy('name', 'asc'));
-        const subcategoriesSnap = await getDocs(subcategoriesQuery);
-        
-        const subcategories: Subcategory[] = subcategoriesSnap.docs.map(doc => ({
-            id: doc.id,
-            name: doc.data().name || 'Unnamed Subcategory',
-            description: doc.data().description || '',
-        }));
+        fetchData();
+    }, [courseRef, subcategoriesRef]);
 
-        return { course, subcategories };
-    } catch (error) {
-        console.error("Error fetching course data:", error);
-        // This will return null and trigger a 404, which is okay if the index isn't ready.
-        return null;
+    if (isLoading) {
+        // You can return a skeleton loader here
+        return <div>Loading...</div>;
     }
-}
 
-
-export default async function CoursePage({ params }: { params: { id: string } }) {
-    const data = await getCourseData(params.id);
-
-    if (!data) {
+    if (!course) {
         notFound();
     }
 
-    const { course, subcategories } = data;
-    
-    // The main data fetching happens on the server. We pass the initial data to the client component.
     return (
         <div className="bg-card/50">
             <div className="container mx-auto px-4 py-12 md:py-24">
@@ -99,7 +109,6 @@ export default async function CoursePage({ params }: { params: { id: string } })
                             </p>
                         </div>
 
-                        {/* Client Component for interactive tabs */}
                         <SubcategoryClientPage courseId={course.id} initialSubcategories={subcategories} />
 
                     </div>

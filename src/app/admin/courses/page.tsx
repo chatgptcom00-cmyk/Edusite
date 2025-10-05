@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -33,6 +33,7 @@ type Course = {
 
 export default function AdminCoursesPage() {
   const router = useRouter();
+  const firestore = useFirestore();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,27 +44,32 @@ export default function AdminCoursesPage() {
       router.push('/wp-admin');
     } else {
       setIsAuthenticated(true);
-      fetchCourses();
     }
   }, [router]);
-
-  async function fetchCourses() {
-    setIsLoading(true);
-    try {
-      const q = query(collection(db, 'courses'), orderBy('createdAt', 'desc'));
-      const querySnapshot = await getDocs(q);
-      const coursesData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        name: doc.data().name,
-        description: doc.data().description,
-      }));
-      setCourses(coursesData);
-    } catch (error) {
-      console.error('Error fetching categories: ', error);
-    } finally {
-      setIsLoading(false);
+  
+  useEffect(() => {
+    if (!isAuthenticated || !firestore) return;
+    
+    async function fetchCourses() {
+      setIsLoading(true);
+      try {
+        const q = query(collection(firestore, 'courses'), orderBy('createdAt', 'desc'));
+        const querySnapshot = await getDocs(q);
+        const coursesData = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          name: doc.data().name,
+          description: doc.data().description,
+        }));
+        setCourses(coursesData);
+      } catch (error) {
+        console.error('Error fetching categories: ', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
-  }
+    
+    fetchCourses();
+  }, [isAuthenticated, firestore]);
 
   if (!isAuthenticated) {
     return (

@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { useFirestore } from '@/firebase';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -31,6 +31,7 @@ export default function EditCoursePage() {
   const router = useRouter();
   const params = useParams();
   const { toast } = useToast();
+  const firestore = useFirestore();
   const courseId = params.id as string;
 
   const [course, setCourse] = useState<Course | null>(null);
@@ -38,12 +39,12 @@ export default function EditCoursePage() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    if (!courseId) return;
+    if (!courseId || !firestore) return;
 
     const fetchCourse = async () => {
       setIsLoading(true);
       try {
-        const docRef = doc(db, 'courses', courseId);
+        const docRef = doc(firestore, 'courses', courseId);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
@@ -69,14 +70,14 @@ export default function EditCoursePage() {
     };
 
     fetchCourse();
-  }, [courseId, router, toast]);
+  }, [courseId, router, toast, firestore]);
 
   const handleSave = async () => {
-    if (!course) return;
+    if (!course || !firestore) return;
 
     setIsSaving(true);
     try {
-      const docRef = doc(db, 'courses', courseId);
+      const docRef = doc(firestore, 'courses', courseId);
       await updateDoc(docRef, {
         name: course.name,
         description: course.description,

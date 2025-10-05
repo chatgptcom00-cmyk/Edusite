@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { useFirestore } from '@/firebase';
 import { courses as staticCourses } from '@/lib/courses';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,6 +23,7 @@ import { BookOpen, TrendingUp } from 'lucide-react';
 export default function AdminPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const firestore = useFirestore();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [courseTitle, setCourseTitle] = useState('');
   const [courseDescription, setCourseDescription] = useState('');
@@ -35,32 +36,37 @@ export default function AdminPage() {
       router.push('/wp-admin');
     } else {
       setIsAuthenticated(true);
-      fetchCourseCount();
     }
   }, [router]);
-
-  async function fetchCourseCount() {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'courses'));
-      setCourseCount(querySnapshot.size);
-    } catch (error) {
-      console.error('Error fetching course count: ', error);
+  
+  useEffect(() => {
+    if (!isAuthenticated || !firestore) return;
+    
+    async function fetchCourseCount() {
+      try {
+        const querySnapshot = await getDocs(collection(firestore, 'courses'));
+        setCourseCount(querySnapshot.size);
+      } catch (error) {
+        console.error('Error fetching course count: ', error);
+      }
     }
-  }
+
+    fetchCourseCount();
+  }, [isAuthenticated, firestore]);
 
   const handleAddCourse = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!courseTitle || !courseDescription) {
+    if (!courseTitle || !courseDescription || !firestore) {
       toast({
         variant: 'destructive',
         title: 'Missing Fields',
-        description: 'Please fill in both title and description.',
+        description: 'Please fill in all fields.',
       });
       return;
     }
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, 'courses'), {
+      await addDoc(collection(firestore, 'courses'), {
         name: courseTitle,
         description: courseDescription,
         createdAt: new Date(),
@@ -71,7 +77,7 @@ export default function AdminPage() {
       });
       setCourseTitle('');
       setCourseDescription('');
-      fetchCourseCount(); // Refresh count after adding
+      setCourseCount(prev => prev + 1); // Increment count
     } catch (error) {
       console.error('Error adding document: ', error);
       toast({
@@ -161,7 +167,7 @@ export default function AdminPage() {
                   type="submit"
                   className="w-full font-semibold"
                   size="lg"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !firestore}
                 >
                   {isSubmitting ? 'Adding...' : 'Add Category to Firestore'}
                 </Button>
