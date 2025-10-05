@@ -13,14 +13,17 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { UploadCloud } from 'lucide-react';
+import { UploadCloud, Moon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useTheme } from '@/components/theme-provider';
+import { Switch } from '@/components/ui/switch';
 
 export default function AdminSettingsPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [logoText, setLogoText] = useState('EduSite');
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const session = localStorage.getItem('admin-auth');
@@ -44,6 +47,10 @@ export default function AdminSettingsPage() {
     // This is a bit of a trick to force a re-render of the header
     window.dispatchEvent(new Event('storage'));
   };
+
+  const handleThemeChange = (checked: boolean) => {
+    setTheme(checked ? 'simple' : 'modern');
+  }
 
   if (!isAuthenticated) {
     return (
@@ -106,6 +113,30 @@ export default function AdminSettingsPage() {
            <Button onClick={handleSave} className="font-semibold" size="lg">
             Save Changes
           </Button>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+            <CardTitle>Theme</CardTitle>
+            <CardDescription>Customize the look and feel of your site.</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <div className='flex items-center justify-between rounded-lg border p-4'>
+                <div className='space-y-0.5'>
+                    <Label htmlFor="simple-mode" className="text-base">Simple Mode</Label>
+                    <p className="text-sm text-muted-foreground">
+                        Use the classic black and white theme.
+                    </p>
+                </div>
+                <div className='flex items-center gap-2'>
+                    <Moon className="h-5 w-5 text-muted-foreground"/>
+                    <Switch
+                        id="simple-mode"
+                        checked={theme === 'simple'}
+                        onCheckedChange={handleThemeChange}
+                    />
+                </div>
+            </div>
         </CardContent>
       </Card>
     </div>
