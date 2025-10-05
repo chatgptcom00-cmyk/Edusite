@@ -11,33 +11,12 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Download, Heart, KeyRound, Camera } from 'lucide-react';
+import { Download, Heart, KeyRound, Camera, Loader2 } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-
-type User = {
-  name: string;
-  email: string;
-  image: string;
-  initials: string;
-};
+import { useUser } from '@/firebase';
 
 export default function ProfilePage() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      const nameParts = (parsedUser.name || '').split(' ');
-      const initials = (
-        (nameParts[0]?.[0] || '') + (nameParts.length > 1 ? nameParts[nameParts.length - 1]?.[0] : '')
-      ).toUpperCase();
-      setUser({ ...parsedUser, image: '', initials });
-    }
-    setLoading(false);
-  }, []);
+  const { user, isUserLoading } = useUser();
 
   const menuItems = [
     {
@@ -60,10 +39,10 @@ export default function ProfilePage() {
     },
   ];
   
-  if (loading) {
+  if (isUserLoading) {
     return (
         <div className="container mx-auto flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-12">
-            <p>Loading profile...</p>
+            <Loader2 className="h-12 w-12 animate-spin text-primary" />
         </div>
     );
   }
@@ -79,6 +58,12 @@ export default function ProfilePage() {
         </div>
       </div>
     )
+  }
+  
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return '..';
+    const nameParts = name.split(' ');
+    return ((nameParts[0]?.[0] || '') + (nameParts.length > 1 ? nameParts[nameParts.length - 1]?.[0] : '')).toUpperCase();
   }
 
   return (
@@ -96,9 +81,9 @@ export default function ProfilePage() {
           <div className="flex items-center gap-6">
             <div className="relative">
               <Avatar className="h-24 w-24 border">
-                <AvatarImage src={user.image} alt={user.name} />
+                <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
                 <AvatarFallback className="text-3xl">
-                  {user.initials}
+                  {getInitials(user.displayName)}
                 </AvatarFallback>
               </Avatar>
               <Button
@@ -111,7 +96,7 @@ export default function ProfilePage() {
               </Button>
             </div>
             <div>
-              <h2 className="text-2xl font-semibold">{user.name}</h2>
+              <h2 className="text-2xl font-semibold">{user.displayName}</h2>
               <p className="text-muted-foreground">{user.email}</p>
             </div>
           </div>
