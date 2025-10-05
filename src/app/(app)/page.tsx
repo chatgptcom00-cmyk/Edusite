@@ -1,3 +1,4 @@
+
 import CourseCard from '@/components/course-card';
 import { Button } from '@/components/ui/button';
 import { courses } from '@/lib/courses';
@@ -14,16 +15,15 @@ export default function Home() {
             <span>All Courses are 100% Free!</span>
           </div>
           <h1 className="font-headline text-4xl font-bold tracking-tight text-primary sm:text-6xl lg:text-7xl">
-            Unlock Your Potential with EduSite
+            Learn Without Limits
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-foreground/80">
-            Explore cutting-edge courses in technology, design, and business.
-            Start your learning journey today and forge the skills for tomorrow.
+            Dive into our comprehensive library of free courses. From web development to design, empower yourself with the skills of tomorrow, today.
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <Button asChild size="lg" className="font-bold">
               <Link href="/courses">
-                Explore Courses <ArrowRight className="ml-2 h-5 w-5" />
+                Browse Courses <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </div>

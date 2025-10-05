@@ -35,13 +35,10 @@ export default function CourseCard({ course }: CourseCardProps) {
         </CardContent>
         <CardFooter className='flex-col pb-8 pt-4'>
           <Button 
-            className="font-semibold text-lg py-6 px-8 rounded-full" 
-            style={{
-              background: 'linear-gradient(to right, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
-              color: 'hsl(var(--primary-foreground))'
-            }}
+            className="font-semibold text-lg py-6 px-8 rounded-full"
+            variant="secondary"
           >
-            View Courses
+            View Course
           </Button>
         </CardFooter>
       </Card>
