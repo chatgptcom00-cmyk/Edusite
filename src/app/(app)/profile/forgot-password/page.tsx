@@ -14,15 +14,19 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { MailCheck, ArrowRight } from 'lucide-react';
+import { MailCheck, ArrowRight, Loader2 } from 'lucide-react';
+import { useAuth } from '@/firebase';
+import { sendPasswordResetEmail } from 'firebase/auth';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const auth = useAuth();
   const [email, setEmail] = useState('');
   const [isEmailSent, setIsEmailSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSendVerification = () => {
+  const handleSendVerification = async () => {
     if (!email) {
       toast({
         variant: 'destructive',
@@ -31,18 +35,27 @@ export default function ForgotPasswordPage() {
       });
       return;
     }
-    // Simulate sending an email
-    console.log(`Sending verification link to ${email}`);
-    setIsEmailSent(true);
-    toast({
-      title: 'Verification Link Sent',
-      description: 'Please check your email to reset your password.',
-    });
-  };
-
-  const handleVerify = () => {
-    // In a real app, this would be handled by a token in the URL
-    router.push('/profile/create-new-password');
+    setIsSubmitting(true);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setIsEmailSent(true);
+      toast({
+        title: 'Verification Link Sent',
+        description: 'Please check your email to reset your password.',
+      });
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description:
+          error.code === 'auth/user-not-found'
+            ? 'No user found with this email.'
+            : 'Failed to send reset email. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -66,10 +79,11 @@ export default function ForgotPasswordPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
-              <Button className="w-full font-semibold" onClick={handleSendVerification}>
-                Send Verification Link
+              <Button className="w-full font-semibold" onClick={handleSendVerification} disabled={isSubmitting}>
+                {isSubmitting ? <Loader2 className="animate-spin" /> : 'Send Verification Link'}
               </Button>
             </CardContent>
           </>
@@ -78,10 +92,10 @@ export default function ForgotPasswordPage() {
             <MailCheck className="h-16 w-16 text-green-500 mb-4" />
             <CardTitle className="font-headline text-2xl mb-2">Check Your Email</CardTitle>
             <CardDescription className="mb-6">
-              We've sent a password reset link to <span className="font-medium text-foreground">{email}</span>. Please click the button below to simulate verification.
+              We've sent a password reset link to <span className="font-medium text-foreground">{email}</span>. Please follow the instructions in the email to continue.
             </CardDescription>
-            <Button className="w-full font-semibold" onClick={handleVerify}>
-              Verify & Reset Password <ArrowRight className="ml-2 h-4 w-4" />
+            <Button className="w-full font-semibold" onClick={() => router.push('/login')}>
+              Return to Login <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardContent>
         )}
